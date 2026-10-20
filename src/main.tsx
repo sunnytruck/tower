@@ -16,12 +16,20 @@ import { StageSelectScreen } from "./StageSelectScreen";
 import { STAGES, DEFAULT_STAGE, stageById } from "./stages";
 
 type Page =
-  "home" | "formation" | "battle" | "upgrade" | "gacha" | "collection" | "stages";
+  | "home"
+  | "formation"
+  | "battle"
+  | "upgrade"
+  | "gacha"
+  | "collection"
+  | "stages";
 function App() {
   const [page, setPage] = useState<Page>("home");
   const { progress, update, transact, warning } = useProgress();
   const formation = progress.formation;
-  const [battleStage, setBattleStage] = useState(() => STAGES[Math.max(0, progress.highestStage - 1)] ?? DEFAULT_STAGE);
+  const [battleStage, setBattleStage] = useState(
+    () => STAGES[Math.max(0, progress.highestStage - 1)] ?? DEFAULT_STAGE,
+  );
   const [battleRun, setBattleRun] = useState(0);
   const [battleOwned, setBattleOwned] = useState([...progress.owned]);
   const [battleLevels, setBattleLevels] = useState<Levels>(() => ({
@@ -41,7 +49,7 @@ function App() {
     const stage = stageById(stageId);
     if (!count || !stage || !progress.campaign[stageId]?.unlocked) return;
     setBattleStage(stage);
-    setBattleRun(run => run + 1);
+    setBattleRun((run) => run + 1);
     setBattleLineup([...formation]);
     setBattleLevels({ ...progress.levels });
     setBattleOwned([...progress.owned]);
@@ -62,7 +70,12 @@ function App() {
         key={battleRun}
         stage={battleStage}
         onStages={() => setPage("stages")}
-        onNext={STAGES[battleStage.number] && progress.campaign[STAGES[battleStage.number].id].unlocked ? () => start(STAGES[battleStage.number].id) : undefined}
+        onNext={
+          STAGES[battleStage.number] &&
+          progress.campaign[STAGES[battleStage.number].id].unlocked
+            ? () => start(STAGES[battleStage.number].id)
+            : undefined
+        }
         lineup={battleLineup}
         levels={battleLevels}
         xp={progress.xp}
@@ -124,7 +137,13 @@ function App() {
         </p>
       )}
       {page === "stages" ? (
-        <StageSelectScreen progress={progress} selectedId={battleStage.id} canStart={count > 0} onStart={start} onFormation={() => setPage("formation")} />
+        <StageSelectScreen
+          progress={progress}
+          selectedId={battleStage.id}
+          canStart={count > 0}
+          onStart={start}
+          onFormation={() => setPage("formation")}
+        />
       ) : page === "gacha" ? (
         <GachaScreen
           progress={progress}
@@ -183,7 +202,11 @@ function App() {
             </span>
           </section>
           <nav className="home-menu" aria-label="メインメニュー">
-            <button className="menu-battle" onClick={() => setPage("stages")} disabled={!count}>
+            <button
+              className="menu-battle"
+              onClick={() => setPage("stages")}
+              disabled={!count}
+            >
               <span className="menu-medallion">
                 <GameIcon name="battle" />
               </span>
@@ -255,7 +278,8 @@ function App() {
               ))}
             </div>
             <p className="session-note">
-              3エリア・全15ステージ。初回1,500信仰石、ボス初回3,000個、周回150個＋XP。最高到達 {progress.highestStage} / 15。
+              3エリア・全15ステージ。初回1,500信仰石、ボス初回3,000個、周回150個＋XP。最高到達{" "}
+              {progress.highestStage} / 15。
             </p>
           </section>
         </>
@@ -350,7 +374,11 @@ function App() {
             <button className="pause" onClick={() => setPage("home")}>
               ホームへ戻る
             </button>
-            <button className="primary" onClick={() => setPage("stages")} disabled={!count}>
+            <button
+              className="primary"
+              onClick={() => setPage("stages")}
+              disabled={!count}
+            >
               ステージを選んで出陣 →
             </button>
           </div>

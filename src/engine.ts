@@ -1,4 +1,4 @@
-import { UNITS, STAGE, ALLIES, INITIAL_ALLIES, type Kind } from "./data.ts";
+import { UNITS, ALLIES, INITIAL_ALLIES, type Kind } from "./data.ts";
 import { ownedFormation } from "./formation.ts";
 import { unitStats, normalizeLevels, type Levels } from "./progression.ts";
 import type { Stats } from "./data.ts";
@@ -47,7 +47,7 @@ export class Battle {
     owned: readonly Kind[] = INITIAL_ALLIES,
     stage: Stage = DEFAULT_STAGE,
   ) {
-    this.stage = {...stage, waves: stage.waves.map(wave => ({...wave}))};
+    this.stage = { ...stage, waves: stage.waves.map((wave) => ({ ...wave })) };
     this.money = stage.startingMoney;
     this.leftHP = stage.baseHP;
     this.rightHP = stage.enemyBaseHP;
@@ -88,9 +88,9 @@ export class Battle {
     if (this.impacts.length > 48) this.impacts.shift();
   }
   time = 0;
-  money = STAGE.startingMoney;
-  leftHP = STAGE.baseHP;
-  rightHP = STAGE.baseHP;
+  money: number;
+  leftHP: number;
+  rightHP: number;
   status: "ready" | "playing" | "paused" | "win" | "lose" = "ready";
   units: Unit[] = [];
   effects: Effect[] = [];
@@ -151,7 +151,10 @@ export class Battle {
     this.hitStop = Math.max(0, this.hitStop - dt);
     this.impacts = this.impacts.filter((e) => (e.life -= dt) > 0);
     this.time += dt;
-    this.money = Math.min(this.stage.maxMoney, this.money + dt * this.stage.income);
+    this.money = Math.min(
+      this.stage.maxMoney,
+      this.money + dt * this.stage.income,
+    );
     for (const k of ALLIES)
       this.cooldowns[k] = Math.max(0, (this.cooldowns[k] ?? 0) - dt);
     while (
@@ -192,15 +195,18 @@ export class Battle {
       u.pose = 0.3;
       if (target) {
         const hits = d.pierce
-          ? targets.filter(v => Math.abs(v.x - u.x) <= d.range)
+          ? targets.filter((v) => Math.abs(v.x - u.x) <= d.range)
           : d.area
-          ? targets.filter((v) => Math.abs(v.x - target.x) <= (d.splash ?? 65))
-          : [target];
+            ? targets.filter(
+                (v) => Math.abs(v.x - target.x) <= (d.splash ?? 65),
+              )
+            : [target];
         for (const v of hits) {
           v.hp -= d.damage;
           v.flash = 0.18;
           v.recoil = -v.side * (u.kind === "keito" ? 22 : 8);
-          if (d.push) v.x = Math.max(105, Math.min(1295, v.x + u.side * d.push));
+          if (d.push)
+            v.x = Math.max(105, Math.min(1295, v.x + u.side * d.push));
           if (d.stun && v.hp > 0) v.stun = Math.max(v.stun ?? 0, d.stun);
           this.impact(
             v.x,

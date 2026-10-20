@@ -20,9 +20,16 @@ export function figure(
   c.save();
   c.translate(u.x + u.recoil, y);
   c.scale(d.size * displayScale, d.size * displayScale);
-  if (d.boss) { drawBoss(c, u, t); c.restore(); return; }
+  if (d.boss) {
+    drawBoss(c, u, t);
+    c.restore();
+    return;
+  }
   if ((u.stun ?? 0) > 0 && u.hp > 0) {
-    c.fillStyle = "#b9ecff"; c.font = "bold 18px serif"; c.textAlign = "center"; c.fillText("Zz", 0, -160);
+    c.fillStyle = "#b9ecff";
+    c.font = "bold 18px serif";
+    c.textAlign = "center";
+    c.fillText("Zz", 0, -160);
   }
   if (hasCharacterAsset(u.kind)) {
     // The old procedural rig is used only after an image has failed to load.
@@ -223,7 +230,17 @@ export function draw(
     c.fillStyle = "#e8d6a9";
     c.font = "bold 27px serif";
     c.textAlign = "center";
-    c.fillText(side === 1 ? "岩" : b.stage.area === 1 ? "朝" : b.stage.area === 2 ? "眠" : "戦", 0, -96);
+    c.fillText(
+      side === 1
+        ? "岩"
+        : b.stage.area === 1
+          ? "朝"
+          : b.stage.area === 2
+            ? "眠"
+            : "戦",
+      0,
+      -96,
+    );
     c.fillStyle = "#222d32";
     c.fillRect(-13, -47, 26, 47);
     c.fillStyle = "#f2c772";
@@ -251,7 +268,9 @@ export function draw(
       u,
       b.time,
       295,
-      UNITS[u.kind].boss ? Math.min(1.4, (height - 70) / (145 * UNITS[u.kind].size)) : 1.4,
+      UNITS[u.kind].boss
+        ? Math.min(1.4, (height - 70) / (145 * UNITS[u.kind].size))
+        : 1.4,
       true,
       b.time - sample.lastMove < 0.12 && !u.pose,
     );

@@ -18,7 +18,9 @@ export function BattleScreen({
   onVictory,
   owned,
   victoryRewards,
-  stage, onStages, onNext,
+  stage,
+  onStages,
+  onNext,
 }: {
   stage: Stage;
   onStages: () => void;
@@ -36,7 +38,8 @@ export function BattleScreen({
   onVictory: (id: string, stageId: string) => void;
 }) {
   const battle = useRef<Battle | null>(null);
-  if (!battle.current) battle.current = new Battle(lineup, levels, owned, stage);
+  if (!battle.current)
+    battle.current = new Battle(lineup, levels, owned, stage);
   const settled = useRef(new WeakSet<Battle>());
   const canvas = useRef<HTMLCanvasElement>(null);
   const [, refresh] = useState(0);
@@ -89,19 +92,22 @@ export function BattleScreen({
   const active = b.status === "playing";
   const currentStage = b.stage;
   const nextWave = currentStage.waves[b.wave];
-  const boss = currentStage.boss ? b.units.find(unit => unit.kind === currentStage.boss && unit.hp > 0) : undefined;
+  const boss = currentStage.boss
+    ? b.units.find((unit) => unit.kind === currentStage.boss && unit.hp > 0)
+    : undefined;
   const waveAdvice = !nextWave
     ? "敵の砦を破壊しよう"
-    : UNITS[nextWave.kind].boss ? UNITS[nextWave.kind].role
-    : nextWave.kind === "sniper"
-      ? "遠距離支援：壁役で攻撃を受けよう"
-      : nextWave.kind === "bomber"
-        ? "範囲攻撃：遠距離から撃破しよう"
-        : nextWave.kind === "heavy"
-          ? "高耐久：後衛の火力で突破しよう"
-          : nextWave.kind === "runner"
-            ? "高速接近：壁役の出撃資金を確保"
-            : "前衛：壁役と後衛を組み合わせよう";
+    : UNITS[nextWave.kind].boss
+      ? UNITS[nextWave.kind].role
+      : nextWave.kind === "sniper"
+        ? "遠距離支援：壁役で攻撃を受けよう"
+        : nextWave.kind === "bomber"
+          ? "範囲攻撃：遠距離から撃破しよう"
+          : nextWave.kind === "heavy"
+            ? "高耐久：後衛の火力で突破しよう"
+            : nextWave.kind === "runner"
+              ? "高速接近：壁役の出撃資金を確保"
+              : "前衛：壁役と後衛を組み合わせよう";
   const retry = () => {
     battle.current = new Battle(b.lineup, b.levels, b.owned, b.stage);
     battle.current!.toggle();
@@ -131,7 +137,12 @@ export function BattleScreen({
                 .padStart(2, "0")}
             </strong>
           </div>
-          <Base label="敵の砦" hp={b.rightHP} maxHP={currentStage.enemyBaseHP} enemy />
+          <Base
+            label="敵の砦"
+            hp={b.rightHP}
+            maxHP={currentStage.enemyBaseHP}
+            enemy
+          />
         </div>
         <div className="funds">
           <GameIcon name="star" />
@@ -214,8 +225,44 @@ export function BattleScreen({
             aria-label="味方は左から、敵は右から進軍します"
           />
         </div>
-        {boss && <div className="boss-health" aria-label={`${UNITS[boss.kind].name}のHP`}><div><b>{UNITS[boss.kind].name}</b><span>{Math.ceil(boss.hp).toLocaleString()} / {boss.maxHP.toLocaleString()}</span></div><div className="meter"><i style={{width: `${100 * Math.max(0, boss.hp) / boss.maxHP}%`}}/></div></div>}
-        {b.bossIntro > 0 && currentStage.boss && <div className={`boss-warning boss-${UNITS[currentStage.boss].boss}`} role="status" style={{animationPlayState: active ? "running" : "paused"}}><span>{UNITS[currentStage.boss].boss === "gate" ? "重門、開く。" : UNITS[currentStage.boss].boss === "sun" ? "暁の号令。" : "森の眠りが、目を覚ます。"}</span><strong>{UNITS[currentStage.boss].name}</strong><small>{UNITS[currentStage.boss].role}</small></div>}
+        {boss && (
+          <div
+            className="boss-health"
+            aria-label={`${UNITS[boss.kind].name}のHP`}
+          >
+            <div>
+              <b>{UNITS[boss.kind].name}</b>
+              <span>
+                {Math.ceil(boss.hp).toLocaleString()} /{" "}
+                {boss.maxHP.toLocaleString()}
+              </span>
+            </div>
+            <div className="meter">
+              <i
+                style={{
+                  width: `${(100 * Math.max(0, boss.hp)) / boss.maxHP}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+        {b.bossIntro > 0 && currentStage.boss && (
+          <div
+            className={`boss-warning boss-${UNITS[currentStage.boss].boss}`}
+            role="status"
+            style={{ animationPlayState: active ? "running" : "paused" }}
+          >
+            <span>
+              {UNITS[currentStage.boss].boss === "gate"
+                ? "重門、開く。"
+                : UNITS[currentStage.boss].boss === "sun"
+                  ? "暁の号令。"
+                  : "森の眠りが、目を覚ます。"}
+            </span>
+            <strong>{UNITS[currentStage.boss].name}</strong>
+            <small>{UNITS[currentStage.boss].role}</small>
+          </div>
+        )}
         {b.status !== "playing" && (
           <div className="overlay">
             <div className="dialog">
@@ -249,12 +296,19 @@ export function BattleScreen({
                   <GameIcon name="star" />
                   <strong>+{currentStage.victoryXP} XP 獲得</strong>
                   <strong className="victory-stones">
-                    ◆ +{victoryRewards[b.id]?.stones ?? 0} 信仰石
-                    {victoryRewards[b.id]?.firstClear
-                      ? "（初回クリア）"
-                      : "（周回報酬）"}
+                    ◆ +{(victoryRewards[b.id]?.stones ?? 0).toLocaleString()}{" "}
+                    信仰石
                   </strong>
-                  {!!victoryRewards[b.id]?.bossBonus && <small>ボス初回ボーナス +{victoryRewards[b.id].bossBonus}個を含む</small>}
+                  <small className="reward-source">
+                    {victoryRewards[b.id]?.firstClear
+                      ? "初回クリア報酬"
+                      : "周回報酬"}
+                  </small>
+                  {!!victoryRewards[b.id]?.bossBonus && (
+                    <small>
+                      ボス初回ボーナス +{victoryRewards[b.id].bossBonus}個を含む
+                    </small>
+                  )}
                   <small>
                     所持XP {xp.toLocaleString()} / ホームから強化できます
                   </small>
@@ -277,8 +331,14 @@ export function BattleScreen({
                     : "もう一度挑む →"}
               </button>
               <div className="result-navigation">
-                <button className="pause" onClick={onStages}>ステージ選択へ</button>
-                {b.status === "win" && onNext && <button className="pause" onClick={onNext}>次のステージへ ▶</button>}
+                <button className="pause" onClick={onStages}>
+                  ステージ選択へ
+                </button>
+                {b.status === "win" && onNext && (
+                  <button className="pause" onClick={onNext}>
+                    次のステージへ ▶
+                  </button>
+                )}
               </div>
             </div>
           </div>
