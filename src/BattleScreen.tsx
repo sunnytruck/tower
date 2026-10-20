@@ -89,8 +89,10 @@ export function BattleScreen({
   const active = b.status === "playing";
   const currentStage = b.stage;
   const nextWave = currentStage.waves[b.wave];
+  const boss = currentStage.boss ? b.units.find(unit => unit.kind === currentStage.boss && unit.hp > 0) : undefined;
   const waveAdvice = !nextWave
     ? "敵の砦を破壊しよう"
+    : UNITS[nextWave.kind].boss ? UNITS[nextWave.kind].role
     : nextWave.kind === "sniper"
       ? "遠距離支援：壁役で攻撃を受けよう"
       : nextWave.kind === "bomber"
@@ -212,6 +214,8 @@ export function BattleScreen({
             aria-label="味方は左から、敵は右から進軍します"
           />
         </div>
+        {boss && <div className="boss-health" aria-label={`${UNITS[boss.kind].name}のHP`}><div><b>{UNITS[boss.kind].name}</b><span>{Math.ceil(boss.hp).toLocaleString()} / {boss.maxHP.toLocaleString()}</span></div><div className="meter"><i style={{width: `${100 * Math.max(0, boss.hp) / boss.maxHP}%`}}/></div></div>}
+        {b.bossIntro > 0 && currentStage.boss && <div className={`boss-warning boss-${UNITS[currentStage.boss].boss}`} role="status" style={{animationPlayState: active ? "running" : "paused"}}><span>{UNITS[currentStage.boss].boss === "gate" ? "重門、開く。" : UNITS[currentStage.boss].boss === "sun" ? "暁の号令。" : "森の眠りが、目を覚ます。"}</span><strong>{UNITS[currentStage.boss].name}</strong><small>{UNITS[currentStage.boss].role}</small></div>}
         {b.status !== "playing" && (
           <div className="overlay">
             <div className="dialog">

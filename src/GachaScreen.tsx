@@ -134,7 +134,7 @@ export function GachaScreen({
         ))}
       </div>
       <p className="summon-note">
-        初回クリアで1,500個、以後は勝利ごとに30個。10連も同じ確率で10回抽選・確定枠なし。重複は将来の＋値用に保存。
+        各ステージ初回1,500個・ボス初回3,000個、周回は150個。10連も同じ確率で10回抽選・確定枠なし。重複は将来の＋値用に保存。
       </p>
       {error && (
         <p className="save-notice" role="alert">

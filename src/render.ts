@@ -1,7 +1,9 @@
 import { Battle, type Unit } from "./engine.ts";
-import { UNITS, STAGE } from "./data.ts";
+import { UNITS } from "./data.ts";
 import { drawAlly, isAlly } from "./characterArt.ts";
 import { hasCharacterAsset } from "./characterAssets.ts";
+import { drawBoss } from "./bossArt.ts";
+import { drawStageScenery } from "./stageScenery.ts";
 import { drawCharacterSprite } from "./characterSprites.ts";
 const motionSamples = new WeakMap<Unit, { x: number; lastMove: number }>();
 const images = new Map<string, HTMLImageElement>();
@@ -18,6 +20,10 @@ export function figure(
   c.save();
   c.translate(u.x + u.recoil, y);
   c.scale(d.size * displayScale, d.size * displayScale);
+  if (d.boss) { drawBoss(c, u, t); c.restore(); return; }
+  if ((u.stun ?? 0) > 0 && u.hp > 0) {
+    c.fillStyle = "#b9ecff"; c.font = "bold 18px serif"; c.textAlign = "center"; c.fillText("Zz", 0, -160);
+  }
   if (hasCharacterAsset(u.kind)) {
     // The old procedural rig is used only after an image has failed to load.
     if (
@@ -159,7 +165,8 @@ export function draw(
   b: Battle,
   reducedMotion = false,
 ) {
-  const w = STAGE.width;
+  const w = b.stage.width;
+  const background = b.stage.background;
   const height = c.canvas.height;
   c.clearRect(0, 0, w, height);
   c.save();
@@ -169,8 +176,8 @@ export function draw(
       Math.cos(b.fxTime * 83) * b.shake * 0.5,
     );
   const sky = c.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, "#a9d8d3");
-  sky.addColorStop(1, "#fff1bf");
+  sky.addColorStop(0, background.sky[0]);
+  sky.addColorStop(1, background.sky[1]);
   c.fillStyle = sky;
   c.fillRect(0, 0, w, height);
   c.fillStyle = "#f8edd1";
@@ -180,7 +187,7 @@ export function draw(
   // Extend the sky to the viewport, keeping all combat positions unchanged.
   c.translate(0, height - 380);
   for (let layer = 0; layer < 3; layer++) {
-    c.fillStyle = ["#bdccbd", "#a5b9aa", "#819e8e"][layer];
+    c.fillStyle = background.hills[layer];
     c.beginPath();
     c.moveTo(0, 280);
     for (let i = 0; i <= 14; i++)
@@ -189,12 +196,13 @@ export function draw(
     c.lineTo(0, 330);
     c.fill();
   }
-  c.fillStyle = "#6a7b60";
+  c.fillStyle = background.accent;
   c.fillRect(0, 292, w, 9);
-  c.fillStyle = "#c1b28c";
+  c.fillStyle = background.ground;
   c.fillRect(0, 301, w, 79);
   c.fillStyle = "#a39575";
   for (let i = 0; i < 60; i++) c.fillRect(i * 29, (i % 3) * 18 + 320, 9, 2);
+  drawStageScenery(c, b.stage);
   for (const side of [1, -1]) {
     const x = side === 1 ? 62 : 1338;
     c.save();
@@ -215,7 +223,7 @@ export function draw(
     c.fillStyle = "#e8d6a9";
     c.font = "bold 27px serif";
     c.textAlign = "center";
-    c.fillText(side === 1 ? "岩" : "戦", 0, -96);
+    c.fillText(side === 1 ? "岩" : b.stage.area === 1 ? "朝" : b.stage.area === 2 ? "眠" : "戦", 0, -96);
     c.fillStyle = "#222d32";
     c.fillRect(-13, -47, 26, 47);
     c.fillStyle = "#f2c772";
@@ -243,7 +251,7 @@ export function draw(
       u,
       b.time,
       295,
-      1.4,
+      UNITS[u.kind].boss ? Math.min(1.4, (height - 70) / (145 * UNITS[u.kind].size)) : 1.4,
       true,
       b.time - sample.lastMove < 0.12 && !u.pose,
     );

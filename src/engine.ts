@@ -15,6 +15,7 @@ export interface Unit {
   pose: number;
   dead: number;
   recoil: number;
+  stun?: number;
 }
 export interface Effect {
   x: number;
@@ -96,6 +97,8 @@ export class Battle {
   cooldowns: Partial<Record<Kind, number>> = {};
   wave = 0;
   serial = 0;
+  bossIntro = 0;
+  bossSeen = false;
   spawn(kind: Kind, side: 1 | -1) {
     const u: Unit = {
       id: ++this.serial,
@@ -111,6 +114,11 @@ export class Battle {
       recoil: 0,
     };
     this.units.push(u);
+    if (this.stats[kind].boss && side === -1) {
+      this.bossSeen = true;
+      this.bossIntro = 3;
+      this.shake = Math.max(this.shake, 8);
+    }
     return u;
   }
   deploy(kind: Kind) {
@@ -136,6 +144,7 @@ export class Battle {
   update(dt: number) {
     if (this.status !== "playing") return;
     this.fxTime += dt;
+    this.bossIntro = Math.max(0, this.bossIntro - dt);
     this.shake = Math.max(0, this.shake - dt * 35);
     this.impactCooldown = Math.max(0, this.impactCooldown - dt);
     const combatDt = Math.max(0, dt - this.hitStop);
@@ -158,6 +167,10 @@ export class Battle {
         u.dead += dt;
         continue;
       }
+      if ((u.stun ?? 0) > 0) {
+        u.stun = Math.max(0, (u.stun ?? 0) - combatDt);
+        continue;
+      }
       const d = this.stats[u.kind];
       u.attack -= combatDt;
       const targets = this.units
@@ -178,17 +191,21 @@ export class Battle {
       u.attack = d.interval;
       u.pose = 0.3;
       if (target) {
-        const hits = d.area
-          ? targets.filter((v) => Math.abs(v.x - target.x) <= 65)
+        const hits = d.pierce
+          ? targets.filter(v => Math.abs(v.x - u.x) <= d.range)
+          : d.area
+          ? targets.filter((v) => Math.abs(v.x - target.x) <= (d.splash ?? 65))
           : [target];
         for (const v of hits) {
           v.hp -= d.damage;
           v.flash = 0.18;
           v.recoil = -v.side * (u.kind === "keito" ? 22 : 8);
+          if (d.push) v.x = Math.max(105, Math.min(1295, v.x + u.side * d.push));
+          if (d.stun && v.hp > 0) v.stun = Math.max(v.stun ?? 0, d.stun);
           this.impact(
             v.x,
             260,
-            u.kind === "keito" ? 3 : d.area ? 1.5 : 1,
+            u.kind === "keito" || d.boss ? 3 : d.area ? 1.5 : 1,
             u.side,
             v.hp <= 0,
           );
@@ -203,7 +220,7 @@ export class Battle {
             this.money = Math.min(this.stage.maxMoney, this.money + 25);
         }
       } else {
-        this.impact(baseX, 220, u.kind === "keito" ? 3 : 1, u.side);
+        this.impact(baseX, 220, u.kind === "keito" || d.boss ? 3 : 1, u.side);
         if (u.side === 1) this.rightHP = Math.max(0, this.rightHP - d.damage);
         else this.leftHP = Math.max(0, this.leftHP - d.damage);
         this.effects.push({
