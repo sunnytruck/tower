@@ -171,7 +171,7 @@ function App() {
                 <br />
                 世界を動かせ。
               </h1>
-              <p>小さな信仰。でっかい一撃。</p>
+              <p>岩石軍団、いざ出陣。</p>
               <button
                 className="primary embark"
                 disabled={!count}

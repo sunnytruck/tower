@@ -1,6 +1,14 @@
 import { ALLY_ROSTER } from "./allyRoster.ts";
 export type AllyKind = (typeof ALLY_ROSTER)[number]["id"];
-export type EnemyKind = "soldier" | "runner" | "heavy" | "sniper" | "bomber" | "gatekeeper" | "emperor" | "guardian";
+export type EnemyKind =
+  | "soldier"
+  | "runner"
+  | "heavy"
+  | "sniper"
+  | "bomber"
+  | "gatekeeper"
+  | "emperor"
+  | "guardian";
 export type Kind = AllyKind | EnemyKind;
 export interface Ability {
   type: "heal" | "slow" | "stun" | "push" | "bossSlayer" | "armor";
@@ -162,10 +170,13 @@ const ENEMY_UNITS = {
   },
 };
 export const UNITS = Object.fromEntries([
-  ...ALLY_ROSTER.map(entry => [entry.id, entry.stats]),
-  ...Object.entries(ENEMY_UNITS).map(([kind, stats]) => [kind, {...stats, knockback: 1}]),
+  ...ALLY_ROSTER.map((entry) => [entry.id, entry.stats]),
+  ...Object.entries(ENEMY_UNITS).map(([kind, stats]) => [
+    kind,
+    { ...stats, knockback: 1 },
+  ]),
 ]) as Record<Kind, Stats>;
 export const INITIAL_ALLIES: Kind[] = ["novice", "monk", "mage"];
 export const LEGACY_ALLIES: Kind[] = [...INITIAL_ALLIES, "keito"];
-export const ALLIES: Kind[] = ALLY_ROSTER.map(entry => entry.id);
+export const ALLIES: Kind[] = ALLY_ROSTER.map((entry) => entry.id);
 export { DEFAULT_STAGE as STAGE } from "./stages.ts";

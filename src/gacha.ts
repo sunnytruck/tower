@@ -18,14 +18,23 @@ export const GACHA_POOL: readonly {
   weight: number;
   placeholder?: boolean;
 }[] = ALLY_ROSTER.map((entry) => {
-  if (entry.id === "keito") return {kind: entry.id, rarity: 4, weight: 1};
-  if (entry.rarity === 4) throw new Error("The legendary slot is reserved for Keito");
-  const peers = ALLY_ROSTER.filter(candidate => candidate.rarity === entry.rarity);
+  if (entry.id === "keito") return { kind: entry.id, rarity: 4, weight: 1 };
+  if (entry.rarity === 4)
+    throw new Error("The legendary slot is reserved for Keito");
+  const peers = ALLY_ROSTER.filter(
+    (candidate) => candidate.rarity === entry.rarity,
+  );
   const budgets = [6000, 3400, 500, 99, 1];
-  const budget = budgets[entry.rarity], index = peers.findIndex(peer => peer.id === entry.id);
-  return {kind: entry.id, rarity: entry.rarity,
-    weight: Math.floor(budget / peers.length) + (index < budget % peers.length ? 1 : 0),
-    placeholder: true};
+  const budget = budgets[entry.rarity],
+    index = peers.findIndex((peer) => peer.id === entry.id);
+  return {
+    kind: entry.id,
+    rarity: entry.rarity,
+    weight:
+      Math.floor(budget / peers.length) +
+      (index < budget % peers.length ? 1 : 0),
+    placeholder: true,
+  };
 });
 export const characterEntry = (kind: Kind) =>
   GACHA_POOL.find((entry) => entry.kind === kind)!;
