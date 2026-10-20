@@ -1,0 +1,514 @@
+:root {
+  font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
+  color: #eeeade;
+  background: #141c29;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #f1cd7b;
+  outline-offset: 4px;
+}
+main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 42px;
+}
+header {
+  height: 89px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #35404a;
+  gap: 24px;
+}
+.brand {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.brand small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #96a0a6;
+  margin-top: 5px;
+}
+.seal {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 45px;
+  border: 1px solid #d8b976;
+  color: #e4c583;
+  font: 30px serif;
+  transform: rotate(-5deg);
+}
+.edition {
+  margin-left: auto;
+  color: #839098;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+.pause {
+  background: transparent;
+  color: #e4ded0;
+  border: 1px solid #58616a;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.stage-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 0 22px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #d5b977;
+}
+h1 {
+  font-family: serif;
+  font-size: 34px;
+  margin: 8px 0 0;
+  letter-spacing: 4px;
+}
+h1 span {
+  font: 12px system-ui;
+  color: #939fa6;
+  letter-spacing: 2px;
+  margin-left: 20px;
+}
+.funds {
+  width: 220px;
+}
+.funds small {
+  font-size: 11px;
+  color: #b9c1c5;
+  display: flex;
+  justify-content: space-between;
+}
+.funds small span {
+  color: #b8c9a1;
+}
+.funds strong {
+  font-size: 34px;
+  letter-spacing: 1px;
+  display: block;
+  color: #f0d18e;
+}
+.funds i {
+  font-style: normal;
+  font-size: 13px;
+  margin-left: 7px;
+}
+.meter {
+  height: 5px;
+  background: #ffffff19;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.meter i {
+  display: block;
+  background: #d5bc80;
+  height: 100%;
+  transition: width 0.1s;
+}
+.battlefield {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #53605f;
+  border-radius: 8px;
+  background: #d9e4df;
+}
+.battle-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #202c32f2;
+  padding: 16px 23px;
+}
+.base {
+  width: 29%;
+}
+.base > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 9px;
+  font-size: 12px;
+}
+.base span {
+  font-size: 15px;
+  font-weight: bold;
+}
+.base small {
+  font-size: 10px;
+  color: #8d9b9c;
+}
+.base .meter i {
+  background: #9cceaf;
+}
+.base.enemy .meter i {
+  background: #d28d7d;
+}
+.timer {
+  text-align: center;
+  font-size: 8px;
+  color: #9aabaa;
+  letter-spacing: 2px;
+}
+.timer strong {
+  font-size: 22px;
+  display: block;
+  color: #e5e8da;
+  letter-spacing: 3px;
+}
+.timer small {
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.world {
+  width: 100%;
+  display: block;
+  aspect-ratio: 1400/380;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #15262c65;
+  backdrop-filter: blur(3px);
+}
+.dialog {
+  text-align: center;
+  background: #17232bef;
+  padding: 25px 40px;
+  border: 1px solid #cbb07870;
+  border-radius: 8px;
+  box-shadow: 0 12px 80px #12202a55;
+}
+.dialog h2 {
+  font: 700 28px serif;
+  letter-spacing: 3px;
+  margin: 12px 0;
+}
+.dialog p {
+  font-size: 12px;
+  color: #b5c0c0;
+  line-height: 1.8;
+}
+.primary {
+  border: 0;
+  border-radius: 3px;
+  background: #e7c785;
+  color: #252b2c;
+  padding: 12px 34px;
+  font-weight: 750;
+  margin-top: 6px;
+}
+.deployment {
+  padding: 22px 0 0;
+}
+.deploy-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 13px;
+}
+.deploy-title h2 {
+  font-size: 14px;
+  margin: 0;
+}
+.deploy-title small {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #839197;
+  margin-left: 12px;
+}
+.deploy-title > span {
+  font-size: 10px;
+  color: #9aa6ac;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+}
+.unit-card {
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  min-height: 146px;
+  background: #24313b;
+  color: #eeeade;
+  border: 1px solid #53606a;
+  border-radius: 5px;
+  padding: 12px 13px 17px;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+.unit-card:not(:disabled):hover {
+  transform: translateY(-4px);
+  border-color: #e7c785;
+}
+.unit-card:disabled {
+  cursor: default;
+}
+.unit-card:disabled .unit-text strong {
+  color: #929b9f;
+}
+.unit-card:disabled canvas {
+  filter: saturate(0.45);
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #b6c0c1;
+}
+.card-top b {
+  font-size: 9px;
+  font-weight: normal;
+  border: 1px solid #627077;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.unit-card canvas {
+  position: absolute;
+  width: 108px;
+  height: 129px;
+  left: -1px;
+  top: 25px;
+}
+.unit-text {
+  position: relative;
+  margin: 19px 0 0 86px;
+}
+.unit-text h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  white-space: nowrap;
+}
+.unit-text strong {
+  font-size: 23px;
+  color: #e7c785;
+  display: block;
+}
+.unit-text small {
+  display: block;
+  font-size: 9px;
+  color: #b1bcb9;
+  margin-top: 5px;
+}
+.cooldown {
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #14202a;
+}
+.cooldown i {
+  height: 100%;
+  display: block;
+  background: var(--accent);
+}
+footer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 10px;
+  color: #89979f;
+  padding: 17px 0;
+}
+footer b {
+  color: #c8cfca;
+  margin-right: 9px;
+}
+footer button {
+  color: #b3bfc0;
+  background: none;
+  border: 0;
+  font-size: 11px;
+}
+.placeholder {
+  margin-left: auto;
+  font-size: 9px;
+}
+@media (min-width: 1500px) {
+  main {
+    padding-top: 18px;
+  }
+  .world {
+    max-height: 43vh;
+  }
+}
+@media (max-width: 1000px) {
+  main {
+    padding: 0 20px;
+  }
+  .edition {
+    display: none;
+  }
+  .pause {
+    margin-left: auto;
+  }
+  .unit-card {
+    padding: 9px 8px 14px;
+  }
+  .unit-card canvas {
+    width: 82px;
+    height: 98px;
+    top: 37px;
+    left: -10px;
+  }
+  .unit-text {
+    margin-left: 54px;
+  }
+  .unit-text h3 {
+    font-size: 12px;
+  }
+  .placeholder {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  main {
+    padding: 0 12px;
+  }
+  header {
+    height: 70px;
+  }
+  .brand {
+    font-size: 17px;
+    letter-spacing: 1px;
+  }
+  .brand small {
+    font-size: 7px;
+    letter-spacing: 1.5px;
+  }
+  .seal {
+    width: 33px;
+    height: 36px;
+    font-size: 24px;
+  }
+  .pause {
+    font-size: 10px;
+    padding: 9px;
+  }
+  .stage-heading {
+    padding: 20px 0 16px;
+    gap: 10px;
+  }
+  .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  h1 {
+    font-size: 26px;
+  }
+  h1 span {
+    display: block;
+    margin: 5px 0 0;
+    font-size: 10px;
+  }
+  .funds {
+    width: 135px;
+  }
+  .funds strong {
+    font-size: 27px;
+  }
+  .funds small {
+    font-size: 9px;
+  }
+  .battle-info {
+    padding: 10px 9px;
+  }
+  .base {
+    width: 35%;
+  }
+  .base > div:first-child {
+    display: block;
+    font-size: 9px;
+    margin-bottom: 6px;
+  }
+  .base span {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .timer strong {
+    font-size: 17px;
+  }
+  .world {
+    height: 230px;
+    object-fit: fill;
+  }
+  .dialog {
+    padding: 20px 14px;
+    max-width: 94%;
+  }
+  .dialog h2 {
+    font-size: 22px;
+  }
+  .dialog p {
+    font-size: 10px;
+  }
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .unit-card {
+    min-height: 127px;
+  }
+  .unit-card canvas {
+    top: 22px;
+    left: 0;
+  }
+  .unit-text {
+    margin-left: 65px;
+    margin-top: 13px;
+  }
+  .deploy-title small {
+    display: none;
+  }
+  .deployment {
+    padding-top: 17px;
+  }
+  footer {
+    line-height: 1.8;
+    align-items: flex-start;
+  }
+  footer > span {
+    flex: 1;
+  }
+  footer button {
+    white-space: nowrap;
+  }
+  .unit-text strong {
+    font-size: 21px;
+  }
+}
