@@ -50,6 +50,12 @@ npm run preview # distの確認
 GitHubの Settings → Pages → Build and deployment → Source を **GitHub Actions** に設定してください。
 リポジトリ設定やPages公開操作はこの実装では実行していません。
 
+## UI
+
+ホームの大型キャラ・アイコンメニュー、コンパクトな戦闘HUD、顔アップの10枠出撃ドックを採用しています。
+出撃可能・資金不足・クールタイムを光・色・ラベルで区別します。
+共通デザインと描画サイズの方針は [UI_DESIGN.md](UI_DESIGN.md) を参照してください。
+
 ## 拡張計画
 
 Phase 1（ホーム・10枠編成・戦闘接続）まで実装済みです。
