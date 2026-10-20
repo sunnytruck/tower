@@ -34,14 +34,16 @@ npm run preview # distの確認
 
 - `src/data.ts`: 4種類の味方・5種類の敵の能力、コスト、再出撃時間、ステージ・出現時刻。
 - `src/engine.ts`: 描画に依存しない戦闘ロジック。時間の単位は秒。
-- `src/render.ts`: Canvas描画、歩行・攻撃・被弾・撃破アニメーションとダメージ表示。
+- `src/render.ts`: 戦場・敵のCanvas描画とダメージ表示。
+- `src/characterArt.ts`: 味方4種の専用衣装・シルエット・アニメーション。
+- `src/assets/ally-faces.png`: 架空の4人の実写風顔アトラス。差し替え方法は [素材説明](src/assets/README.md)。
 - `src/main.tsx`: ホームと編成画面、画面移動とセッション内の編成状態。
 - `src/formation.ts`: 10枠の正規化・移動・解除。
 - `src/BattleScreen.tsx` / `src/Portrait.tsx` / `src/style.css`: 戦闘UI・共通キャラ表示・レスポンシブ表示。
 
 顔は特定の人物をモデルとしない架空の仮素材です。写真を `public/portraits/` に置き、
 ユニット定義の任意項目 `portrait` に `"./portraits/face.jpg"` のように指定すると、戦場とカードに反映されます。
-輪郭に合わせて切り抜かれます。既存の作品の画像・UIは使用していません。
+味方は顔画像の透明な輪郭を使い、キャラ別の衣装・武器と合成します。既存の作品の画像・UIは使用していません。
 
 ## GitHub Pages
 

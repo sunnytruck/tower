@@ -1,5 +1,7 @@
 import { Battle, type Unit } from "./engine.ts";
 import { UNITS, STAGE } from "./data.ts";
+import { drawAlly, isAlly } from "./characterArt.ts";
+const motionSamples = new WeakMap<Unit, { x: number; lastMove: number }>();
 const images = new Map<string, HTMLImageElement>();
 export function figure(
   c: CanvasRenderingContext2D,
@@ -8,11 +10,25 @@ export function figure(
   y = 295,
   displayScale = 1,
   showHealth = true,
+  walking = false,
 ) {
   const d = UNITS[u.kind];
   c.save();
   c.translate(u.x + u.recoil, y);
   c.scale(d.size * displayScale, d.size * displayScale);
+  if (isAlly(u.kind)) {
+    drawAlly(c, u, t, walking);
+    if (showHealth && u.hp > 0) {
+      const top = u.kind === "mage" ? -146 : u.kind === "keito" ? -145 : -120;
+      c.fillStyle = "#283b33";
+      c.fillRect(-22, top, 44, 4);
+      c.fillStyle = "#9ed7bc";
+      c.fillRect(-22, top, (44 * Math.max(0, u.hp)) / d.hp, 4);
+    }
+    c.restore();
+    return;
+  }
+
   if (u.hp <= 0) {
     c.globalAlpha = Math.max(0, 1 - u.dead / 0.55);
     c.rotate(u.side * u.dead * 5);
@@ -62,30 +78,6 @@ export function figure(
     }
     c.restore();
   }
-  if (u.kind === "keito") {
-    // Stone shoulder armour and ceremonial cape, drawn from original geometry.
-    c.fillStyle = "#c66d42";
-    c.beginPath();
-    c.moveTo(-12, -40);
-    c.lineTo(-27, -5);
-    c.lineTo(27, -5);
-    c.lineTo(12, -40);
-    c.fill();
-    c.fillStyle = "#f1d485";
-    c.beginPath();
-    c.roundRect(-13, -36, 26, 24, 5);
-    c.fill();
-    c.fillStyle = "#677f75";
-    for (const x of [-19, 12]) {
-      c.beginPath();
-      c.roundRect(x, -40, 9, 13, 2);
-      c.fill();
-    }
-    c.fillStyle = "#f9efb5";
-    c.beginPath();
-    c.arc(0, -27, 4, 0, Math.PI * 2);
-    c.fill();
-  }
   // Fictional clay portrait; replace through the optional portrait URL in data.ts.
   const g = c.createRadialGradient(-7, -65, 1, 0, -57, 29);
   g.addColorStop(0, "#f8dcc1");
@@ -133,21 +125,6 @@ export function figure(
   c.textAlign = "center";
   c.fillStyle = "#1e2934";
   c.fillText(d.symbol, 0, -73);
-  if (u.kind === "keito") {
-    c.fillStyle = "#d8b36d";
-    c.beginPath();
-    c.moveTo(-24, -83);
-    c.lineTo(-20, -95);
-    c.lineTo(-8, -88);
-    c.lineTo(0, -102);
-    c.lineTo(9, -88);
-    c.lineTo(21, -95);
-    c.lineTo(24, -83);
-    c.closePath();
-    c.fill();
-    c.strokeStyle = "#8b714a";
-    c.stroke();
-  }
 
   if (u.pose) {
     c.strokeStyle = "#ffe4a3";
@@ -241,8 +218,26 @@ export function draw(
     c.fill();
     c.restore();
   }
-  for (const u of [...b.units].sort((a, b) => a.x - b.x))
-    figure(c, u, b.time, 295, 1.4);
+  for (const u of [...b.units].sort((a, b) => a.x - b.x)) {
+    let sample = motionSamples.get(u);
+    if (!sample) {
+      sample = { x: u.x, lastMove: -1 };
+      motionSamples.set(u, sample);
+    }
+    if (Math.abs(u.x - sample.x) > 0.001) {
+      sample.lastMove = b.time;
+      sample.x = u.x;
+    }
+    figure(
+      c,
+      u,
+      b.time,
+      295,
+      1.4,
+      true,
+      b.time - sample.lastMove < 0.12 && !u.pose,
+    );
+  }
   for (const e of b.impacts) {
     const progress = 1 - e.life / e.duration;
     const radius = (e.death ? 25 : 18) * e.power * (0.3 + progress * 2);

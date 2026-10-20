@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { UNITS, type Kind } from "./data";
 import { figure } from "./render";
+import { CHARACTER_ART, isAlly, onArtLoaded } from "./characterArt";
 export function Portrait({
   kind,
   hero = false,
@@ -14,7 +15,20 @@ export function Portrait({
   useEffect(() => {
     const canvas = ref.current!,
       c = canvas.getContext("2d")!;
-    const paint = () => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const extent =
+      kind === "mage"
+        ? 146
+        : kind === "keito"
+          ? 155
+          : kind === "monk"
+            ? 122
+            : 115;
+    const box = isAlly(kind) ? CHARACTER_ART[kind].box : null;
+    const scale = face && box ? 240 / box[3] : (hero ? 525 : 248) / extent;
+    const baseline =
+      face && box ? 128 - (box[1] + box[3] / 2) * scale : hero ? 555 : 267;
+    const paint = (time = 0) => {
       c.clearRect(0, 0, canvas.width, canvas.height);
       figure(
         c,
@@ -30,23 +44,30 @@ export function Portrait({
           dead: 0,
           recoil: 0,
         },
-        0,
-        hero ? 555 : face ? 320 : 267,
-        (hero ? 4.7 : face ? 3.1 : 2.35) / UNITS[kind].size,
+        time,
+        baseline,
+        scale / UNITS[kind].size,
         false,
       );
     };
     paint();
-    // Repaint when a user-supplied replacement portrait has loaded.
-    const source = UNITS[kind].portrait;
-    if (source) {
-      const img = new Image();
-      img.onload = paint;
-      img.src = source;
-      return () => {
-        img.onload = null;
+    const unsubscribe = onArtLoaded(() => paint());
+    let frame = 0,
+      last = 0;
+    if (hero) {
+      const tick = (now: number) => {
+        if (now - last > 33) {
+          paint(motion.matches ? 0 : now / 1000);
+          last = now;
+        }
+        frame = requestAnimationFrame(tick);
       };
+      frame = requestAnimationFrame(tick);
     }
+    return () => {
+      unsubscribe();
+      cancelAnimationFrame(frame);
+    };
   }, [kind, hero, face]);
   return (
     <canvas
