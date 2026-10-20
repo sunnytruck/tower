@@ -1,5 +1,5 @@
 import type { Kind } from "./data.ts";
-export type SpriteKind = "novice" | "monk" | "mage" | "keito";
+export type SpriteKind = "novice" | "monk" | "mage" | "keito" | "bellkeeper";
 export type CharacterAction = "idle" | "walk" | "attack" | "hit" | "death";
 export interface CharacterClip {
   frames: readonly string[];
@@ -9,7 +9,7 @@ export interface CharacterClip {
 export interface CharacterAsset {
   /** Full standing art for non-battle screens; may still be draft artwork. */
   image: string;
-  quality?: "draft-background" | "production";
+  quality?: "draft-background" | "production" | "placeholder";
   clips?: Partial<Record<CharacterAction, CharacterClip>>;
   /** Shared source-pixel canvas: retain the same scale across differently sized frames. */
   frameCanvas?: { width: number; height: number };
@@ -42,6 +42,10 @@ export const CHARACTER_ASSETS: Record<SpriteKind, CharacterAsset> = {
     width: 115,
     height: 145,
     animation: { step: 5, bob: 3, lean: 0.025, lunge: 5, deathSpin: -1.8 },
+  },
+  bellkeeper: {
+    image: "./characters/bellkeeper.svg", quality: "placeholder", width: 130, height: 145,
+    animation: {step: 6, bob: 2, lean: 0.08, lunge: 12, deathSpin: -2},
   },
   keito: {
     image: "./characters/iwason/portrait.png",

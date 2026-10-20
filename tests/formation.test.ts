@@ -6,10 +6,10 @@ import {
   normalizeFormation,
 } from "../src/formation.ts";
 import { Battle } from "../src/engine.ts";
-test("ten slots start with four unique allies and six empty slots", () => {
+test("ten slots start with three unique allies and seven empty slots", () => {
   const f = initialFormation();
   assert.equal(f.length, 10);
-  assert.equal(f.filter(Boolean).length, 4);
+  assert.equal(f.filter(Boolean).length, 3);
   assert.equal(f[9], null);
 });
 test("assignment moves characters, replaces a slot, removes and preserves input", () => {

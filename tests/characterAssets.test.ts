@@ -6,11 +6,11 @@ import {
   characterAction,
   characterFrame,
 } from "../src/characterAssets.ts";
-test("each ally has an independent full-body PNG/WebP asset path", () => {
+test("each ally has an independent full-body image asset path", () => {
   const entries = Object.values(CHARACTER_ASSETS);
-  assert.equal(entries.length, 4);
-  assert.equal(new Set(entries.map((v) => v.image)).size, 4);
-  for (const entry of entries) assert.match(entry.image, /\.(png|webp)$/);
+  assert.equal(entries.length, 5);
+  assert.equal(new Set(entries.map((v) => v.image)).size, 5);
+  for (const entry of entries) assert.match(entry.image, /\.(png|webp|svg)$/);
 });
 test("contain sizing preserves complete tall and wide images without distortion", () => {
   for (const [width, height] of [
@@ -37,6 +37,7 @@ test("all configured PNG assets are included in the checkout", async () => {
     const bytes = await readFile(
       new URL("../public/" + source.replace(/^\.\//, ""), import.meta.url),
     );
+    if (source.endsWith(".svg")) { assert.match(bytes.toString(), /viewBox="0 0 360 420"/); continue; }
     assert.equal(bytes.subarray(1, 4).toString(), "PNG");
     assert.ok(bytes.readUInt32BE(16) > 0 && bytes.readUInt32BE(20) > 0);
     assert.equal(bytes[25], 6, "RGBA PNG includes an alpha channel");

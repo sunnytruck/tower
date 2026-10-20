@@ -104,7 +104,7 @@ test("versioned save round-trips XP, all levels, formation and unknown future fi
   const data = {
     ...newProgress(),
     xp: 1234,
-    levels: { novice: 7, monk: 4, mage: 9, keito: 20 },
+    levels: { ...newProgress().levels, novice: 7, monk: 4, mage: 9, keito: 20 },
     formation: [
       null,
       "mage",
@@ -217,6 +217,6 @@ test("invalid levels are clamped and unavailable storage does not crash the game
   );
   const data = loadProgress(storage).data;
   assert.equal(data.xp, 0);
-  assert.deepEqual(data.levels, { novice: 20, monk: 1, mage: 6, keito: 1 });
+  assert.deepEqual(data.levels, { novice: 20, monk: 1, mage: 6, keito: 1, bellkeeper: 1 });
   assert.equal(loadProgress(null).canSave, false);
 });

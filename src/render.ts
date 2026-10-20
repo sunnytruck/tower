@@ -1,6 +1,7 @@
 import { Battle, type Unit } from "./engine.ts";
 import { UNITS, STAGE } from "./data.ts";
 import { drawAlly, isAlly } from "./characterArt.ts";
+import { hasCharacterAsset } from "./characterAssets.ts";
 import { drawCharacterSprite } from "./characterSprites.ts";
 const motionSamples = new WeakMap<Unit, { x: number; lastMove: number }>();
 const images = new Map<string, HTMLImageElement>();
@@ -17,12 +18,13 @@ export function figure(
   c.save();
   c.translate(u.x + u.recoil, y);
   c.scale(d.size * displayScale, d.size * displayScale);
-  if (isAlly(u.kind)) {
+  if (hasCharacterAsset(u.kind)) {
     // The old procedural rig is used only after an image has failed to load.
     if (
       !drawCharacterSprite(c, u, t, walking, d.size * displayScale, showHealth)
     )
-      drawAlly(c, u, t, walking);
+      if (isAlly(u.kind)) drawAlly(c, u, t, walking);
+      else { c.fillStyle = d.color; c.fillText("鐘", -12, -50); }
     if (showHealth && u.hp > 0) {
       const top = u.kind === "mage" ? -146 : u.kind === "keito" ? -145 : -120;
       c.fillStyle = "#283b33";

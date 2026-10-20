@@ -1,4 +1,4 @@
-import { ALLIES, type Kind } from "./data.ts";
+import { ALLIES, INITIAL_ALLIES, type Kind } from "./data.ts";
 export const FORMATION_SIZE = 10;
 export type Formation = (Kind | null)[];
 export function normalizeFormation(input: readonly (Kind | null)[]): Formation {
@@ -11,7 +11,7 @@ export function normalizeFormation(input: readonly (Kind | null)[]): Formation {
   });
 }
 export function initialFormation(): Formation {
-  return normalizeFormation(ALLIES);
+  return normalizeFormation(INITIAL_ALLIES);
 }
 // Move an already selected character rather than allowing duplicate cooldown slots.
 export function assignSlot(
@@ -33,4 +33,11 @@ export function assignSlot(
   }
   next[slot] = kind;
   return next;
+}
+
+export function ownedFormation(input: readonly (Kind | null)[], owned: readonly Kind[]): Formation {
+  return normalizeFormation(input).map(kind => kind && owned.includes(kind) ? kind : null);
+}
+export function assignOwnedSlot(input: readonly (Kind | null)[], slot: number, kind: Kind | null, owned: readonly Kind[]): Formation {
+  return ownedFormation(kind && !owned.includes(kind) ? input : assignSlot(input, slot, kind), owned);
 }

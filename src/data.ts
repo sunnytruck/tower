@@ -3,6 +3,7 @@ export type Kind =
   | "monk"
   | "mage"
   | "keito"
+  | "bellkeeper"
   | "soldier"
   | "runner"
   | "heavy"
@@ -85,6 +86,11 @@ export const UNITS: Record<Kind, Stats> = {
     size: 1.65,
     symbol: "岩",
   },
+  bellkeeper: {
+    name: "鐘守りの巡礼", role: "鐘の盾・範囲", hp: 780, damage: 85,
+    range: 65, interval: 2.6, speed: 18, cost: 380, cooldown: 14,
+    area: true, color: "#61cbbb", size: 1.25, symbol: "鐘",
+  },
   soldier: {
     name: "雑魚兵士",
     role: "近距離",
@@ -161,13 +167,17 @@ export const UNITS: Record<Kind, Stats> = {
     symbol: "砲",
   },
 };
-export const ALLIES: Kind[] = ["novice", "monk", "mage", "keito"];
+export const INITIAL_ALLIES: Kind[] = ["novice", "monk", "mage"];
+export const LEGACY_ALLIES: Kind[] = [...INITIAL_ALLIES, "keito"];
+export const ALLIES: Kind[] = [...LEGACY_ALLIES, "bellkeeper"];
 export const STAGE = {
   name: "岩の聖地",
   subtitle: "第一章 / 静寂を破る者",
   width: 1400,
   baseHP: 3200,
   victoryXP: 300,
+  firstClearStones: 1500,
+  repeatStones: 30,
   income: 30,
   startingMoney: 300,
   maxMoney: 1800,

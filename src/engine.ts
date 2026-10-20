@@ -1,5 +1,5 @@
-import { UNITS, STAGE, ALLIES, type Kind } from "./data.ts";
-import { normalizeFormation } from "./formation.ts";
+import { UNITS, STAGE, ALLIES, INITIAL_ALLIES, type Kind } from "./data.ts";
+import { ownedFormation } from "./formation.ts";
 import { unitStats, normalizeLevels, type Levels } from "./progression.ts";
 import type { Stats } from "./data.ts";
 export interface Unit {
@@ -37,8 +37,10 @@ export class Battle {
   readonly levels: Readonly<Levels>;
   readonly stats: Readonly<Record<Kind, Stats>>;
   readonly lineup: readonly (Kind | null)[];
-  constructor(lineup: readonly (Kind | null)[] = ALLIES, levels: Levels = {}) {
-    this.lineup = Object.freeze(normalizeFormation(lineup));
+  readonly owned: readonly Kind[];
+  constructor(lineup: readonly (Kind | null)[] = INITIAL_ALLIES, levels: Levels = {}, owned: readonly Kind[] = INITIAL_ALLIES) {
+    this.owned = Object.freeze([...owned]);
+    this.lineup = Object.freeze(ownedFormation(lineup, this.owned));
     this.levels = Object.freeze(normalizeLevels(levels));
     this.stats = Object.freeze(
       Object.fromEntries(
@@ -105,6 +107,7 @@ export class Battle {
     if (
       this.status !== "playing" ||
       !this.lineup.includes(kind) ||
+      !this.owned.includes(kind) ||
       this.money < d.cost ||
       (this.cooldowns[kind] ?? 0) > 0
     )
