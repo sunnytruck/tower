@@ -16,7 +16,7 @@ README.jsonは素材に付属する説明データです。セット内画像は
 | `death.png`                      | HPが0になった後                  | 撃破時間中のフェード    |
 | `special.png`                    | 今後の演出用として保存           | 今回は未使用            |
 
-強化画面はまだ未実装です。追加時は `CharacterImage` を使えば同じ `portrait.png` を表示できます。
+強化画面でも共通の `CharacterImage` を使い、同じ `portrait.png` を大型表示します。
 `portrait.png` に含まれる下部の別ポーズや「被弾」の文字も、元データのまま表示されます。
 
 ## 共有する仕組み
