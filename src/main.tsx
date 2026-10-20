@@ -62,6 +62,7 @@ function App() {
   }, []);
   const b = battle.current;
   const active = b.status === "playing";
+  const nextWave = STAGE.waves[b.wave];
   const retry = () => {
     battle.current = new Battle();
     battle.current.toggle();
@@ -95,6 +96,27 @@ function App() {
             {STAGE.name}
             <span>静寂を破る者</span>
           </h1>
+        </div>
+        <div className="wave-hint" aria-label="次の敵出現">
+          <small>次の襲来</small>
+          <strong>
+            {nextWave
+              ? `${UNITS[nextWave.kind].name} / ${Math.max(0, Math.ceil(nextWave.at - b.time))}秒後`
+              : "敵の増援なし"}
+          </strong>
+          <span>
+            {nextWave
+              ? nextWave.kind === "sniper"
+                ? "遠距離支援：壁役で攻撃を受けよう"
+                : nextWave.kind === "bomber"
+                  ? "範囲攻撃：遠距離から撃破しよう"
+                  : nextWave.kind === "heavy"
+                    ? "高耐久：後衛の火力で突破しよう"
+                    : nextWave.kind === "runner"
+                      ? "高速接近：壁役の出撃資金を確保"
+                      : "前衛：壁役と後衛を組み合わせよう"
+              : "敵の砦を破壊しよう"}
+          </span>
         </div>
         <div className="funds">
           <small>
@@ -163,7 +185,7 @@ function App() {
               </h2>
               <p>
                 {b.status === "ready"
-                  ? "資金を貯め、信者を出撃。敵の砦を打ち砕こう。"
+                  ? "壁役で後衛を守ろう。大型だけの軍勢では突破できない。"
                   : b.status === "paused"
                     ? "戦闘と資金の増加は停止しています。"
                     : b.status === "win"
@@ -204,7 +226,8 @@ function App() {
             return (
               <button
                 key={kind}
-                className="unit-card"
+                className={`unit-card ${active && b.money >= d.cost && cd <= 0 ? "available" : "unavailable"}`}
+                aria-label={`${d.name}、出撃コスト${d.cost}円、${!active ? "戦闘停止中" : cd > 0 ? `再出撃まで${cd.toFixed(1)}秒` : b.money < d.cost ? `あと${Math.ceil(d.cost - b.money)}円必要` : "出撃可能"}`}
                 disabled={!active || b.money < d.cost || cd > 0}
                 onClick={() => {
                   b.deploy(kind);
@@ -221,13 +244,24 @@ function App() {
                 <Portrait kind={kind} />
                 <div className="unit-text">
                   <h3>{d.name}</h3>
-                  <strong>¥ {d.cost}</strong>
-                  <small>
+                  <strong>
+                    <span className="cost-label">出撃</span> ¥ {d.cost}
+                  </strong>
+                  <span className="cooldown-label">
                     {cd > 0
-                      ? `再出撃 ${cd.toFixed(1)}s`
+                      ? `再出撃 ${cd.toFixed(1)} / ${d.cooldown}秒`
+                      : `再出撃間隔 ${d.cooldown}秒`}
+                  </span>
+                  <small>
+                    {!active
+                      ? b.status === "ready"
+                        ? "開始待ち"
+                        : "戦闘停止中"
                       : b.money < d.cost
-                        ? "資金を貯めよう"
-                        : "出撃準備完了"}
+                        ? `あと ¥${Math.ceil(d.cost - b.money)}`
+                        : cd > 0
+                          ? "再出撃待ち"
+                          : "● 出撃可能"}
                   </small>
                 </div>
                 <div className="cooldown">

@@ -154,3 +154,16 @@ test("ranged enemy stops behind the frontline and bomber splash is localized", (
   assert.ok(units[1].hp < 330);
   assert.equal(units[2].hp, 330);
 });
+
+test("deployment timing changes the outcome for the same wall and attacker composition", () => {
+  for (const delay of [0, 60]) {
+    const b = new Battle();
+    b.toggle();
+    for (let i = 0; i < 60 * 360 && b.status === "playing"; i++) {
+      if (b.time >= delay)
+        for (const k of ["mage", "novice"] as const) b.deploy(k);
+      b.update(1 / 60);
+    }
+    assert.equal(b.status, delay === 0 ? "win" : "lose");
+  }
+});
