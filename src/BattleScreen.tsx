@@ -3,10 +3,12 @@ import type { Formation } from "./formation";
 import { CharacterImage } from "./CharacterImage";
 import { GameIcon } from "./GameIcon";
 import { Battle } from "./engine";
-import { UNITS, STAGE, type Kind } from "./data";
+import { UNITS, type Kind } from "./data";
 import { draw } from "./render";
 import { levelOf, type Levels } from "./progression";
 import "./style.css";
+import "./stages.css";
+import type { Stage } from "./stages";
 export function BattleScreen({
   lineup,
   onHome,
@@ -16,21 +18,25 @@ export function BattleScreen({
   onVictory,
   owned,
   victoryRewards,
+  stage, onStages, onNext,
 }: {
+  stage: Stage;
+  onStages: () => void;
+  onNext?: () => void;
   lineup: Formation;
   onHome: () => void;
   levels: Levels;
   owned: readonly Kind[];
   victoryRewards: Record<
     string,
-    { xp: number; stones: number; firstClear: boolean }
+    { xp: number; stones: number; firstClear: boolean; bossBonus?: number }
   >;
   xp: number;
   saveWarning: string;
-  onVictory: (id: string) => void;
+  onVictory: (id: string, stageId: string) => void;
 }) {
   const battle = useRef<Battle | null>(null);
-  if (!battle.current) battle.current = new Battle(lineup, levels, owned);
+  if (!battle.current) battle.current = new Battle(lineup, levels, owned, stage);
   const settled = useRef(new WeakSet<Battle>());
   const canvas = useRef<HTMLCanvasElement>(null);
   const [, refresh] = useState(0);
@@ -48,7 +54,7 @@ export function BattleScreen({
         !settled.current.has(battle.current!)
       ) {
         settled.current.add(battle.current!);
-        onVictory(battle.current!.id);
+        onVictory(battle.current!.id, battle.current!.stage.id);
       }
       draw(canvas.current!.getContext("2d")!, battle.current!, motion.matches);
       if (now - ui > 90) {
@@ -81,7 +87,8 @@ export function BattleScreen({
   }, [onVictory]);
   const b = battle.current!;
   const active = b.status === "playing";
-  const nextWave = STAGE.waves[b.wave];
+  const currentStage = b.stage;
+  const nextWave = currentStage.waves[b.wave];
   const waveAdvice = !nextWave
     ? "敵の砦を破壊しよう"
     : nextWave.kind === "sniper"
@@ -94,7 +101,7 @@ export function BattleScreen({
             ? "高速接近：壁役の出撃資金を確保"
             : "前衛：壁役と後衛を組み合わせよう";
   const retry = () => {
-    battle.current = new Battle(b.lineup, b.levels, b.owned);
+    battle.current = new Battle(b.lineup, b.levels, b.owned, b.stage);
     battle.current!.toggle();
     refresh((v) => v + 1);
   };
@@ -104,12 +111,12 @@ export function BattleScreen({
         <div className="hud-stage">
           <GameIcon name="rock" />
           <div>
-            <small>STAGE 01</small>
-            <b>{STAGE.name}</b>
+            <small>STAGE {String(currentStage.number).padStart(2, "0")}</small>
+            <b>{currentStage.name}</b>
           </div>
         </div>
         <div className="hud-vitals">
-          <Base label="総本山" hp={b.leftHP} />
+          <Base label="総本山" hp={b.leftHP} maxHP={currentStage.baseHP} />
           <div className="timer">
             <small>経過時間</small>
             <strong>
@@ -122,20 +129,20 @@ export function BattleScreen({
                 .padStart(2, "0")}
             </strong>
           </div>
-          <Base label="敵の砦" hp={b.rightHP} enemy />
+          <Base label="敵の砦" hp={b.rightHP} maxHP={currentStage.enemyBaseHP} enemy />
         </div>
         <div className="funds">
           <GameIcon name="star" />
           <div>
             <small>
-              所持金 <span>+{STAGE.income}/秒</span>
+              所持金 <span>+{currentStage.income}/秒</span>
             </small>
             <strong>
               {Math.floor(b.money).toLocaleString()}
               <i>円</i>
             </strong>
             <span className="fund-limit">
-              上限 {STAGE.maxMoney.toLocaleString()}
+              上限 {currentStage.maxMoney.toLocaleString()}
             </span>
           </div>
         </div>
@@ -189,7 +196,7 @@ export function BattleScreen({
               : "敵の増援なし"}
           </strong>
           <small>
-            敵軍 {b.wave}/{STAGE.waves.length}
+            敵軍 {b.wave}/{currentStage.waves.length}
           </small>
         </div>
         <div
@@ -221,12 +228,12 @@ export function BattleScreen({
                   : b.status === "paused"
                     ? "しばし、静寂。"
                     : b.status === "win"
-                      ? "岩の聖地、奪還。"
+                      ? `${currentStage.name}、奪還。`
                       : "総本山、陥落。"}
               </h2>
               <p>
                 {b.status === "ready"
-                  ? "壁役で後衛を守ろう。大型だけの軍勢では突破できない。"
+                  ? currentStage.subtitle
                   : b.status === "paused"
                     ? "戦闘と資金の増加は停止しています。"
                     : b.status === "win"
@@ -236,13 +243,14 @@ export function BattleScreen({
               {b.status === "win" && (
                 <div className="victory-xp" role="status">
                   <GameIcon name="star" />
-                  <strong>+{STAGE.victoryXP} XP 獲得</strong>
+                  <strong>+{currentStage.victoryXP} XP 獲得</strong>
                   <strong className="victory-stones">
                     ◆ +{victoryRewards[b.id]?.stones ?? 0} 信仰石
                     {victoryRewards[b.id]?.firstClear
                       ? "（初回クリア）"
                       : "（周回報酬）"}
                   </strong>
+                  {!!victoryRewards[b.id]?.bossBonus && <small>ボス初回ボーナス +{victoryRewards[b.id].bossBonus}個を含む</small>}
                   <small>
                     所持XP {xp.toLocaleString()} / ホームから強化できます
                   </small>
@@ -264,6 +272,10 @@ export function BattleScreen({
                     ? "戦闘に戻る →"
                     : "もう一度挑む →"}
               </button>
+              <div className="result-navigation">
+                <button className="pause" onClick={onStages}>ステージ選択へ</button>
+                {b.status === "win" && onNext && <button className="pause" onClick={onNext}>次のステージへ ▶</button>}
+              </div>
             </div>
           </div>
         )}
@@ -357,9 +369,11 @@ function Base({
   label,
   hp,
   enemy = false,
+  maxHP,
 }: {
   label: string;
   hp: number;
+  maxHP: number;
   enemy?: boolean;
 }) {
   return (
@@ -367,11 +381,11 @@ function Base({
       <div>
         <b>{label}</b>
         <span>
-          {hp.toLocaleString()} <small>/ {STAGE.baseHP}</small>
+          {hp.toLocaleString()} <small>/ {maxHP}</small>
         </span>
       </div>
       <div className="meter">
-        <i style={{ width: `${(hp / STAGE.baseHP) * 100}%` }} />
+        <i style={{ width: `${(hp / maxHP) * 100}%` }} />
       </div>
     </div>
   );

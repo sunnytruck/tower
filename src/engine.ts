@@ -2,6 +2,7 @@ import { UNITS, STAGE, ALLIES, INITIAL_ALLIES, type Kind } from "./data.ts";
 import { ownedFormation } from "./formation.ts";
 import { unitStats, normalizeLevels, type Levels } from "./progression.ts";
 import type { Stats } from "./data.ts";
+import { DEFAULT_STAGE, type Stage } from "./stages.ts";
 export interface Unit {
   id: number;
   kind: Kind;
@@ -38,11 +39,17 @@ export class Battle {
   readonly stats: Readonly<Record<Kind, Stats>>;
   readonly lineup: readonly (Kind | null)[];
   readonly owned: readonly Kind[];
+  readonly stage: Stage;
   constructor(
     lineup: readonly (Kind | null)[] = INITIAL_ALLIES,
     levels: Levels = {},
     owned: readonly Kind[] = INITIAL_ALLIES,
+    stage: Stage = DEFAULT_STAGE,
   ) {
+    this.stage = {...stage, waves: stage.waves.map(wave => ({...wave}))};
+    this.money = stage.startingMoney;
+    this.leftHP = stage.baseHP;
+    this.rightHP = stage.enemyBaseHP;
     this.owned = Object.freeze([...owned]);
     this.lineup = Object.freeze(ownedFormation(lineup, this.owned));
     this.levels = Object.freeze(normalizeLevels(levels));
@@ -135,14 +142,14 @@ export class Battle {
     this.hitStop = Math.max(0, this.hitStop - dt);
     this.impacts = this.impacts.filter((e) => (e.life -= dt) > 0);
     this.time += dt;
-    this.money = Math.min(STAGE.maxMoney, this.money + dt * STAGE.income);
+    this.money = Math.min(this.stage.maxMoney, this.money + dt * this.stage.income);
     for (const k of ALLIES)
       this.cooldowns[k] = Math.max(0, (this.cooldowns[k] ?? 0) - dt);
     while (
-      this.wave < STAGE.waves.length &&
-      STAGE.waves[this.wave].at <= this.time
+      this.wave < this.stage.waves.length &&
+      this.stage.waves[this.wave].at <= this.time
     )
-      this.spawn(STAGE.waves[this.wave++].kind, -1);
+      this.spawn(this.stage.waves[this.wave++].kind, -1);
     for (const u of this.units) {
       u.recoil *= Math.exp(-dt * 14);
       u.flash = Math.max(0, u.flash - dt);
@@ -193,7 +200,7 @@ export class Battle {
             color: u.side === 1 ? "#ffe2a0" : "#ffa79a",
           });
           if (v.hp <= 0 && v.side === -1)
-            this.money = Math.min(STAGE.maxMoney, this.money + 25);
+            this.money = Math.min(this.stage.maxMoney, this.money + 25);
         }
       } else {
         this.impact(baseX, 220, u.kind === "keito" ? 3 : 1, u.side);

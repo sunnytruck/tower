@@ -197,7 +197,7 @@ test("first-clear and repeat stones accompany XP exactly once per win, including
   saveProgress(storage, won);
   const loaded = loadProgress(storage).data,
     repeat = awardVictory(loaded, "repeat", "win", 300);
-  assert.equal(repeat.stones, 1530);
+  assert.equal(repeat.stones, 1650);
   assert.equal(repeat.xp, 600);
   assert.equal(repeat.victoryRewards.repeat.firstClear, false);
   assert.equal(awardVictory(repeat, "loss", "lose", 300), repeat);

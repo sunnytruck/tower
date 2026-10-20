@@ -8,7 +8,10 @@ export type Kind =
   | "runner"
   | "heavy"
   | "sniper"
-  | "bomber";
+  | "bomber"
+  | "gatekeeper"
+  | "emperor"
+  | "guardian";
 export interface Stats {
   name: string;
   role: string;
@@ -24,6 +27,11 @@ export interface Stats {
   size: number;
   symbol: string;
   portrait?: string;
+  boss?: "gate" | "sun" | "dream";
+  splash?: number;
+  push?: number;
+  pierce?: boolean;
+  stun?: number;
 }
 export const UNITS: Record<Kind, Stats> = {
   novice: {
@@ -176,50 +184,24 @@ export const UNITS: Record<Kind, Stats> = {
     size: 1.25,
     symbol: "砲",
   },
+  gatekeeper: {
+    name: "異端の門番", role: "重門の一撃・範囲ふっとばし", hp: 2500, damage: 85,
+    range: 70, interval: 3.2, speed: 14, cost: 0, cooldown: 0, area: true,
+    color: "#b37c58", size: 1.65, symbol: "門", boss: "gate", splash: 75, push: 30,
+  },
+  emperor: {
+    name: "朝活皇帝", role: "暁の光槍・直線貫通", hp: 6500, damage: 115,
+    range: 280, interval: 4.5, speed: 10, cost: 0, cooldown: 0, area: true,
+    color: "#f3b646", size: 1.6, symbol: "暁", boss: "sun", pierce: true,
+  },
+  guardian: {
+    name: "永眠の守護者", role: "まどろみの波・範囲停止", hp: 11000, damage: 150,
+    range: 115, interval: 5, speed: 10, cost: 0, cooldown: 0, area: true,
+    color: "#9cb7bf", size: 1.7, symbol: "眠", boss: "dream", splash: 95, stun: 1.1,
+  },
 };
 export const INITIAL_ALLIES: Kind[] = ["novice", "monk", "mage"];
 export const LEGACY_ALLIES: Kind[] = [...INITIAL_ALLIES, "keito"];
 export const ALLIES: Kind[] = [...LEGACY_ALLIES, "bellkeeper"];
-export const STAGE = {
-  name: "岩の聖地",
-  subtitle: "第一章 / 静寂を破る者",
-  width: 1400,
-  baseHP: 3200,
-  victoryXP: 300,
-  firstClearStones: 1500,
-  repeatStones: 30,
-  income: 30,
-  startingMoney: 300,
-  maxMoney: 1800,
-  // Each phase combines a frontline with support, followed by a recovery window.
-  waves: [
-    { at: 3, kind: "soldier" },
-    { at: 8, kind: "runner" },
-    { at: 14, kind: "soldier" },
-    { at: 17, kind: "sniper" },
-    { at: 23, kind: "heavy" },
-    { at: 25, kind: "runner" },
-    { at: 32, kind: "bomber" },
-    { at: 34, kind: "soldier" },
-    { at: 39, kind: "runner" },
-    { at: 40, kind: "runner" },
-    { at: 50, kind: "heavy" },
-    { at: 52, kind: "sniper" },
-    { at: 58, kind: "soldier" },
-    { at: 59, kind: "bomber" },
-    { at: 67, kind: "runner" },
-    { at: 68, kind: "runner" },
-    { at: 78, kind: "heavy" },
-    { at: 80, kind: "bomber" },
-    { at: 84, kind: "sniper" },
-    { at: 88, kind: "soldier" },
-    { at: 98, kind: "heavy" },
-    { at: 100, kind: "sniper" },
-    { at: 104, kind: "runner" },
-    { at: 105, kind: "bomber" },
-    { at: 116, kind: "heavy" },
-    { at: 117, kind: "heavy" },
-    { at: 120, kind: "sniper" },
-    { at: 122, kind: "bomber" },
-  ] as { at: number; kind: Kind }[],
-};
+// Compatibility export for the original stage and older integrations.
+export { DEFAULT_STAGE as STAGE } from "./stages.ts";

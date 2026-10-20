@@ -3,29 +3,33 @@ import { createRoot } from "react-dom/client";
 import { BattleScreen } from "./BattleScreen";
 import { CharacterImage } from "./CharacterImage";
 import { GameIcon, SacredLandscape } from "./GameIcon";
-import { ALLIES, UNITS, STAGE, type Kind } from "./data";
+import { ALLIES, UNITS, type Kind } from "./data";
 import { initialFormation, assignOwnedSlot, type Formation } from "./formation";
 import "./style.css";
 import { useProgress } from "./useProgress";
-import { awardVictory, upgradeCharacter } from "./progressStore";
+import { awardStageVictory, upgradeCharacter } from "./progressStore";
 import { unitStats, levelOf, type Levels } from "./progression";
 import { UpgradeScreen } from "./UpgradeScreen";
 import { GachaScreen } from "./GachaScreen";
 import { CollectionScreen } from "./CollectionScreen";
+import { StageSelectScreen } from "./StageSelectScreen";
+import { STAGES, DEFAULT_STAGE, stageById } from "./stages";
 
 type Page =
-  "home" | "formation" | "battle" | "upgrade" | "gacha" | "collection";
+  "home" | "formation" | "battle" | "upgrade" | "gacha" | "collection" | "stages";
 function App() {
   const [page, setPage] = useState<Page>("home");
   const { progress, update, transact, warning } = useProgress();
   const formation = progress.formation;
+  const [battleStage, setBattleStage] = useState(() => STAGES[Math.max(0, progress.highestStage - 1)] ?? DEFAULT_STAGE);
+  const [battleRun, setBattleRun] = useState(0);
   const [battleOwned, setBattleOwned] = useState([...progress.owned]);
   const [battleLevels, setBattleLevels] = useState<Levels>(() => ({
     ...progress.levels,
   }));
   const onVictory = useCallback(
-    (id: string) => {
-      update((data) => awardVictory(data, id, "win", STAGE.victoryXP));
+    (id: string, stageId: string) => {
+      update((data) => awardStageVictory(data, id, "win", stageId));
     },
     [update],
   );
@@ -33,8 +37,11 @@ function App() {
   const [battleLineup, setBattleLineup] = useState<Formation>(initialFormation);
   const [notice, setNotice] = useState("");
   const count = formation.filter(Boolean).length;
-  function start() {
-    if (!count) return;
+  function start(stageId: string) {
+    const stage = stageById(stageId);
+    if (!count || !stage || !progress.campaign[stageId]?.unlocked) return;
+    setBattleStage(stage);
+    setBattleRun(run => run + 1);
     setBattleLineup([...formation]);
     setBattleLevels({ ...progress.levels });
     setBattleOwned([...progress.owned]);
@@ -52,6 +59,10 @@ function App() {
   if (page === "battle")
     return (
       <BattleScreen
+        key={battleRun}
+        stage={battleStage}
+        onStages={() => setPage("stages")}
+        onNext={STAGES[battleStage.number] && progress.campaign[STAGES[battleStage.number].id].unlocked ? () => start(STAGES[battleStage.number].id) : undefined}
         lineup={battleLineup}
         levels={battleLevels}
         xp={progress.xp}
@@ -112,7 +123,9 @@ function App() {
           {warning}
         </p>
       )}
-      {page === "gacha" ? (
+      {page === "stages" ? (
+        <StageSelectScreen progress={progress} selectedId={battleStage.id} canStart={count > 0} onStart={start} onFormation={() => setPage("formation")} />
+      ) : page === "gacha" ? (
         <GachaScreen
           progress={progress}
           transact={transact}
@@ -142,10 +155,10 @@ function App() {
               <button
                 className="primary embark"
                 disabled={!count}
-                onClick={start}
+                onClick={() => setPage("stages")}
               >
                 <GameIcon name="battle" />
-                岩の聖地へ出陣 <span>▶</span>
+                冒険の旅へ <span>▶</span>
               </button>
               {!count && (
                 <p className="empty-warning" role="status">
@@ -170,12 +183,12 @@ function App() {
             </span>
           </section>
           <nav className="home-menu" aria-label="メインメニュー">
-            <button className="menu-battle" onClick={start} disabled={!count}>
+            <button className="menu-battle" onClick={() => setPage("stages")} disabled={!count}>
               <span className="menu-medallion">
                 <GameIcon name="battle" />
               </span>
               <b>戦闘</b>
-              <small>いざ、出陣！</small>
+              <small>全15ステージへ</small>
             </button>
             <button
               className="menu-formation"
@@ -242,9 +255,7 @@ function App() {
               ))}
             </div>
             <p className="session-note">
-              戦闘勝利で{STAGE.victoryXP}XP＋信仰石。初回
-              {STAGE.firstClearStones}個・周回{STAGE.repeatStones}
-              個。進行は自動保存。
+              3エリア・全15ステージ。初回1,500信仰石、ボス初回3,000個、周回150個＋XP。最高到達 {progress.highestStage} / 15。
             </p>
           </section>
         </>
@@ -339,8 +350,8 @@ function App() {
             <button className="pause" onClick={() => setPage("home")}>
               ホームへ戻る
             </button>
-            <button className="primary" onClick={start} disabled={!count}>
-              この編成で出陣 →
+            <button className="primary" onClick={() => setPage("stages")} disabled={!count}>
+              ステージを選んで出陣 →
             </button>
           </div>
         </>

@@ -18,7 +18,8 @@ import {
 } from "./progression.ts";
 export const SAVE_KEY = "jitto-war-save";
 import { type GachaBatch, GACHA_POOL } from "./gacha.ts";
-export const SAVE_VERSION = 3;
+import { STAGES, DEFAULT_STAGE, initialCampaign, stageById, type Campaign } from "./stages.ts";
+export const SAVE_VERSION = 4;
 const LEGACY_KEYS = [
   "jitto-save",
   "jittoWarSave",
@@ -40,9 +41,11 @@ export interface Progress {
   gachaHistory: GachaBatch[];
   pendingGacha: string | null;
   stageClears: number;
+  campaign: Campaign;
+  highestStage: number;
   victoryRewards: Record<
     string,
-    { xp: number; stones: number; firstClear: boolean }
+    { xp: number; stones: number; firstClear: boolean; stageId?: string; bossBonus?: number }
   >;
 }
 export interface SaveStorage {
@@ -77,6 +80,8 @@ export function newProgress(): Progress {
     gachaHistory: [],
     pendingGacha: null,
     stageClears: 0,
+    campaign: initialCampaign(),
+    highestStage: 1,
     victoryRewards: {},
   };
 }
@@ -172,6 +177,24 @@ export function migrateProgress(input: unknown): Progress {
         ),
       ]
     : [];
+  const campaign = initialCampaign();
+  const previousCampaign = record(data.campaign);
+  // The old game had one stage: retain its clear and first-reward status.
+  if (integer(data.version, 0) < 4) {
+    const clears = integer(data.stageClears, claimedVictories.length);
+    campaign[DEFAULT_STAGE.id] = {unlocked: true, clears, firstRewardClaimed: clears > 0};
+  } else {
+    for (const stage of STAGES) {
+      const saved = record(previousCampaign[stage.id]), clears = integer(saved.clears, 0);
+      campaign[stage.id] = {unlocked: saved.unlocked === true || clears > 0, clears,
+        firstRewardClaimed: saved.firstRewardClaimed === true || clears > 0};
+    }
+  }
+  campaign[DEFAULT_STAGE.id].unlocked = true;
+  for (let i = 1; i < STAGES.length; i++) {
+    if (campaign[STAGES[i - 1].id].clears > 0) campaign[STAGES[i].id].unlocked = true;
+  }
+  const highestStage = Math.max(...STAGES.filter(s => campaign[s.id].unlocked).map(s => s.number));
   return {
     ...data,
     version: SAVE_VERSION,
@@ -199,6 +222,8 @@ export function migrateProgress(input: unknown): Progress {
       ? (data.pendingGacha as string)
       : null,
     stageClears: integer(data.stageClears, claimedVictories.length),
+    campaign,
+    highestStage,
     victoryRewards: Object.fromEntries(
       Object.entries(record(data.victoryRewards)).map(([id, value]) => [
         id,
@@ -206,6 +231,8 @@ export function migrateProgress(input: unknown): Progress {
           xp: integer(record(value).xp, 0),
           stones: integer(record(value).stones, 0),
           firstClear: record(value).firstClear === true,
+          ...(typeof record(value).stageId === "string" ? {stageId: record(value).stageId as string} : {}),
+          ...(typeof record(value).bossBonus === "number" ? {bossBonus: integer(record(value).bossBonus, 0)} : {}),
         },
       ]),
     ),
@@ -311,26 +338,38 @@ export function awardVictory(
   id: string,
   status: string,
   reward: number,
+  stageId = DEFAULT_STAGE.id,
 ): Progress {
+  const stage = stageById(stageId), state = data.campaign[stageId];
   if (
     status !== "win" ||
     !id ||
     data.claimedVictories.includes(id) ||
     !Number.isSafeInteger(reward) ||
-    reward <= 0
+    reward <= 0 || !stage || !state?.unlocked || reward !== stage.victoryXP
   )
     return data;
-  const firstClear = data.stageClears === 0;
-  const stones = firstClear ? STAGE.firstClearStones : STAGE.repeatStones;
+  const firstClear = !state.firstRewardClaimed;
+  const bossBonus = firstClear ? stage.bossBonus : 0;
+  const stones = firstClear ? stage.firstClearStones + bossBonus : stage.repeatStones;
+  const campaign = {...data.campaign, [stageId]: {...state, clears: state.clears + 1, firstRewardClaimed: true}};
+  const next = STAGES[stage.number];
+  if (next) campaign[next.id] = {...campaign[next.id], unlocked: true};
   return {
     ...data,
     xp: Math.min(MAX_XP, data.xp + reward),
     stones: Math.min(MAX_XP, data.stones + stones),
     stageClears: data.stageClears + 1,
+    campaign,
+    highestStage: Math.max(data.highestStage, next?.number ?? stage.number),
     claimedVictories: [...data.claimedVictories, id],
     victoryRewards: {
       ...data.victoryRewards,
-      [id]: { xp: reward, stones, firstClear },
+      [id]: { xp: reward, stones, firstClear, stageId, bossBonus },
     },
   };
+}
+export function awardStageVictory(data: Progress, id: string, status: string, stageId: string): Progress {
+  const stage = stageById(stageId);
+  return stage ? awardVictory(data, id, status, stage.victoryXP, stageId) : data;
 }
