@@ -9,12 +9,15 @@ export function figure(
 ) {
   const d = UNITS[u.kind];
   c.save();
-  c.translate(u.x, y);
+  c.translate(u.x + u.recoil, y);
   c.scale(d.size, d.size);
   if (u.hp <= 0) {
     c.globalAlpha = Math.max(0, 1 - u.dead / 0.55);
-    c.rotate(u.side * u.dead * 2);
-    c.translate(0, u.dead * 45);
+    c.rotate(u.side * u.dead * 5);
+    c.translate(
+      -u.side * u.dead * 75,
+      -Math.sin((u.dead / 0.55) * Math.PI) * 45,
+    );
   } else c.translate(u.pose ? u.side * 7 : 0, Math.sin(t * 9 + u.id) * 2);
   c.strokeStyle = "#202b35";
   c.lineWidth = 5;
@@ -38,6 +41,25 @@ export function figure(
   c.moveTo(12, -31);
   c.lineTo(23 + (u.pose ? 15 : 0), u.pose ? -35 : -19);
   c.stroke();
+  if (u.kind === "sniper" || u.kind === "bomber") {
+    c.save();
+    c.scale(u.side, 1);
+    c.fillStyle = "#303c48";
+    if (u.kind === "sniper") {
+      c.fillRect(8, -30, 48, 6);
+      c.fillRect(22, -37, 13, 6);
+    } else {
+      c.beginPath();
+      c.arc(23, -26, 14, 0, Math.PI * 2);
+      c.fill();
+      c.fillRect(25, -34, 23, 12);
+      c.fillStyle = "#e4a67e";
+      c.beginPath();
+      c.arc(48, -28, 5, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.restore();
+  }
   // Fictional clay portrait; replace through the optional portrait URL in data.ts.
   const g = c.createRadialGradient(-7, -65, 1, 0, -57, 29);
   g.addColorStop(0, "#f8dcc1");
@@ -103,9 +125,19 @@ export function figure(
   }
   c.restore();
 }
-export function draw(c: CanvasRenderingContext2D, b: Battle) {
+export function draw(
+  c: CanvasRenderingContext2D,
+  b: Battle,
+  reducedMotion = false,
+) {
   const w = STAGE.width;
   c.clearRect(0, 0, w, 380);
+  c.save();
+  if (!reducedMotion && b.status === "playing")
+    c.translate(
+      Math.sin(b.fxTime * 105) * b.shake,
+      Math.cos(b.fxTime * 83) * b.shake * 0.5,
+    );
   const sky = c.createLinearGradient(0, 0, 0, 380);
   sky.addColorStop(0, "#d9e4df");
   sky.addColorStop(1, "#f0e7cc");
@@ -165,6 +197,37 @@ export function draw(c: CanvasRenderingContext2D, b: Battle) {
     c.restore();
   }
   for (const u of [...b.units].sort((a, b) => a.x - b.x)) figure(c, u, b.time);
+  for (const e of b.impacts) {
+    const progress = 1 - e.life / e.duration;
+    const radius = (e.death ? 25 : 18) * e.power * (0.3 + progress * 2);
+    c.globalAlpha = (1 - progress) * 0.8;
+    c.strokeStyle = e.color;
+    c.lineWidth = (1 - progress) * 3 * e.power;
+    c.beginPath();
+    c.ellipse(e.x, e.y, radius, radius * 0.45, 0, 0, Math.PI * 2);
+    c.stroke();
+    const count = e.power >= 3 ? 12 : 6;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const distance = radius * (e.death ? 1.6 : 1);
+      const x = e.x + Math.cos(angle) * distance,
+        y = e.y + Math.sin(angle) * distance - progress * 25;
+      c.fillStyle = i % 2 ? e.color : "#fff7db";
+      c.fillRect(
+        x,
+        y,
+        Math.max(1, 5 * (1 - progress)),
+        Math.max(1, 5 * (1 - progress)),
+      );
+    }
+    if (e.power >= 3) {
+      c.globalAlpha = (1 - progress) * 0.7;
+      c.fillStyle = "#fff2ba";
+      c.beginPath();
+      c.arc(e.x, e.y, 24 * (1 - progress), 0, Math.PI * 2);
+      c.fill();
+    }
+  }
   for (const e of b.effects) {
     c.globalAlpha = Math.min(1, e.life * 3);
     c.font = "bold 25px sans-serif";
@@ -176,4 +239,5 @@ export function draw(c: CanvasRenderingContext2D, b: Battle) {
     c.fillText(e.text, e.x, e.y - (0.8 - e.life) * 65);
   }
   c.globalAlpha = 1;
+  c.restore();
 }

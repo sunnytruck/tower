@@ -21,6 +21,7 @@ function Portrait({ kind }: { kind: (typeof ALLIES)[number] }) {
         pose: 0,
         flash: 0,
         dead: 0,
+        recoil: 0,
       },
       0,
       112,
@@ -33,6 +34,7 @@ function App() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [, refresh] = useState(0);
   useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0,
       last = 0,
       ui = 0;
@@ -40,7 +42,7 @@ function App() {
       const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
       last = now;
       battle.current.update(dt);
-      draw(canvas.current!.getContext("2d")!, battle.current);
+      draw(canvas.current!.getContext("2d")!, battle.current, motion.matches);
       if (now - ui > 90) {
         refresh((v) => v + 1);
         ui = now;

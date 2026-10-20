@@ -34,13 +34,13 @@ test("pause freezes time, income, cooldown and combat; fresh battle resets", () 
   assert.equal(fresh.units.length, 0);
   assert.equal(fresh.leftHP, STAGE.baseHP);
 });
-test("all three enemies appear and an undefended base loses", () => {
+test("all five enemies appear and an undefended base loses", () => {
   const b = new Battle();
   b.toggle();
-  advance(b, 24);
+  advance(b, 35);
   assert.deepEqual(
     new Set(b.units.map((u) => u.kind)),
-    new Set(["soldier", "runner", "heavy"]),
+    new Set(["soldier", "runner", "heavy", "sniper", "bomber"]),
   );
   advance(b, 300);
   assert.equal(b.status, "lose");
@@ -80,4 +80,77 @@ test("area attacks hit multiple targets while single attacks hit one", () => {
     assert.ok(x.hp < 850);
     assert.equal(y.hp < 850, kind === "monk");
   }
+});
+
+test("single-role spam and unsupported attackers cannot clear the stage", () => {
+  for (const choices of [
+    ["keito"],
+    ["novice"],
+    ["mage"],
+    ["monk"],
+    ["mage", "keito"],
+  ] as const) {
+    const b = new Battle();
+    b.toggle();
+    for (let i = 0; i < 60 * 360 && b.status === "playing"; i++) {
+      for (const k of choices) b.deploy(k);
+      b.update(1 / 60);
+    }
+    assert.equal(b.status, "lose", choices.join("+"));
+  }
+});
+test("hits trigger bounded effects and a brief combat stop without blocking deployment", () => {
+  const b = new Battle();
+  b.toggle();
+  const a = b.spawn("keito", 1);
+  a.x = 500;
+  a.attack = 0;
+  const target = b.spawn("soldier", -1);
+  target.x = 520;
+  b.update(0.01);
+  assert.ok(target.hp <= 0);
+  assert.ok(target.recoil > 0);
+  assert.ok(b.hitStop > 0 && b.hitStop <= 0.045);
+  assert.ok(b.impacts.some((e) => e.death && e.power === 3));
+  const time = b.time,
+    money = b.money;
+  assert.ok(b.deploy("novice"));
+  const x = a.x;
+  b.update(0.01);
+  assert.equal(a.x, x);
+  assert.ok(b.time > time);
+  assert.ok(b.money < money);
+  for (let i = 0; i < 100; i++) b.impact(500, 200, 3, 1);
+  assert.equal(b.impacts.length, 48);
+  b.toggle();
+  const paused = JSON.stringify(b);
+  advance(b, 1);
+  assert.equal(JSON.stringify(b), paused);
+});
+test("ranged enemy stops behind the frontline and bomber splash is localized", () => {
+  const b = new Battle();
+  b.toggle();
+  const sniper = b.spawn("sniper", -1);
+  sniper.x = 600;
+  sniper.attack = 0;
+  const wall = b.spawn("novice", 1);
+  wall.x = 350;
+  const x = sniper.x;
+  b.update(0.01);
+  assert.equal(sniper.x, x);
+  assert.ok(wall.hp < 330);
+  const c = new Battle();
+  c.toggle();
+  const bomber = c.spawn("bomber", -1);
+  bomber.x = 600;
+  bomber.attack = 0;
+  const units = [510, 480, 350].map((x) => {
+    const u = c.spawn("novice", 1);
+    u.x = x;
+    return u;
+  });
+  c.update(0.01);
+  assert.ok(units[0].hp < 330);
+  assert.ok(units[1].hp < 330);
+  assert.equal(units[2].hp, 330);
 });
