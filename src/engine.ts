@@ -1,4 +1,5 @@
 import { UNITS, STAGE, ALLIES, type Kind } from "./data.ts";
+import { normalizeFormation } from "./formation.ts";
 export interface Unit {
   id: number;
   kind: Kind;
@@ -29,6 +30,10 @@ export interface Impact {
   color: string;
 }
 export class Battle {
+  readonly lineup: readonly (Kind | null)[];
+  constructor(lineup: readonly (Kind | null)[] = ALLIES) {
+    this.lineup = Object.freeze(normalizeFormation(lineup));
+  }
   impacts: Impact[] = [];
   hitStop = 0;
   impactCooldown = 0;
@@ -83,7 +88,7 @@ export class Battle {
     const d = UNITS[kind];
     if (
       this.status !== "playing" ||
-      !ALLIES.includes(kind) ||
+      !this.lineup.includes(kind) ||
       this.money < d.cost ||
       (this.cooldowns[kind] ?? 0) > 0
     )

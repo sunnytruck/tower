@@ -710,3 +710,422 @@ footer button,
     transform: none;
   }
 }
+.home-return {
+  background: none;
+  border: 1px solid #667477;
+  color: #d9dfd7;
+  border-radius: 4px;
+  min-height: 44px;
+  padding: 6px 12px;
+  font-size: 11px;
+  margin-left: auto;
+}
+.hub {
+  display: block;
+  height: auto;
+  min-height: 100svh;
+  padding-bottom: 20px;
+}
+.hub header {
+  min-height: 76px;
+}
+.hub .pause {
+  margin-left: auto;
+}
+.home-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 48px 32px;
+  margin: 26px 0;
+  border: 1px solid #596258;
+  border-radius: 9px;
+  background: linear-gradient(115deg, #2d413d, #1b2732);
+}
+.home-hero h1 {
+  font-size: 46px;
+}
+.home-hero p,
+.formation-heading p {
+  color: #b3bfc1;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.home-emblem {
+  border: 2px solid #c8ac70;
+  padding: 12px 35px;
+  color: #e7cc91;
+  font: 100px serif;
+  transform: rotate(-6deg);
+  margin: 0 30px;
+}
+.home-emblem small {
+  display: block;
+  font: 13px system-ui;
+  text-align: center;
+  letter-spacing: 8px;
+}
+.home-lineup {
+  padding: 20px;
+  border: 1px solid #3f5059;
+  border-radius: 7px;
+  background: #1e2b34;
+}
+.lineup-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.lineup-summary div {
+  padding: 12px;
+  background: #14212a;
+  border-radius: 4px;
+}
+.lineup-summary span {
+  display: block;
+  color: #9ba99b;
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+.lineup-summary b {
+  font-size: 12px;
+}
+.session-note {
+  color: #99a7ad;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.home-menu {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+.home-menu button {
+  padding: 20px 12px;
+  background: #2a3a3e;
+  color: #ece8d6;
+  border: 1px solid #ab986c;
+  border-radius: 5px;
+  text-align: left;
+  min-height: 92px;
+}
+.home-menu button span {
+  display: block;
+  font-size: 10px;
+  line-height: 1.8;
+  margin-top: 8px;
+  color: #b4bfb9;
+}
+.home-menu button:disabled {
+  background: #1c2932;
+  border-color: #3b4a52;
+  cursor: default;
+  color: #9dabb2;
+}
+button:disabled.primary {
+  opacity: 0.5;
+  cursor: default;
+}
+.formation-heading {
+  padding: 28px 0 16px;
+}
+.formation-slots {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.formation-slot {
+  position: relative;
+  background: #21313b;
+  color: #d8dfd9;
+  border: 1px solid #4b5e66;
+  border-radius: 6px;
+  padding: 12px 8px;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+.formation-slot.selected {
+  border: 2px solid #eed090;
+  background: #34463d;
+}
+.formation-slot > span {
+  font-size: 9px;
+  color: #a9b6b9;
+  letter-spacing: 1px;
+}
+.formation-slot canvas {
+  width: 65px;
+  height: 78px;
+}
+.formation-slot > strong {
+  font-size: 42px;
+  font-weight: 300;
+  height: 78px;
+  color: #81948b;
+}
+.formation-slot b {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.formation-slot small {
+  font-size: 9px;
+  color: #b9c3be;
+}
+.character-picker {
+  margin-top: 24px;
+}
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.roster-grid button {
+  display: flex;
+  align-items: center;
+  color: #ece9dc;
+  background: #273740;
+  border: 1px solid #596a71;
+  border-radius: 5px;
+  padding: 10px 8px;
+  text-align: left;
+  min-width: 0;
+}
+.roster-grid canvas {
+  width: 70px;
+  height: 84px;
+  flex-shrink: 0;
+}
+.roster-grid h3 {
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.roster-grid span,
+.roster-grid small {
+  display: block;
+  font-size: 10px;
+  color: #b7c2c2;
+  line-height: 1.8;
+}
+.roster-grid b {
+  display: block;
+  font-size: 10px;
+  color: #e1c88c;
+  margin-top: 8px;
+}
+.formation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 0;
+  flex-wrap: wrap;
+}
+.formation-actions > span {
+  margin-right: auto;
+  color: #bdcbb5;
+  font-size: 11px;
+}
+.formation-actions .primary {
+  margin: 0;
+}
+.battle-deck {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+.battle-deck .unit-card {
+  min-height: 94px;
+  padding: 7px 9px 9px;
+}
+.battle-deck .unit-card canvas {
+  width: 53px;
+  height: 63px;
+  left: -2px;
+  top: 22px;
+}
+.battle-deck .unit-text {
+  margin: 6px 0 0 45px;
+}
+.battle-deck .unit-text h3 {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.battle-deck .unit-text strong {
+  font-size: 17px;
+}
+.battle-deck .cooldown-label {
+  font-size: 8px;
+  margin-top: 1px;
+}
+.battle-deck .unit-text small {
+  font-size: 9px;
+  margin-top: 2px;
+}
+.battle-deck .card-top {
+  font-size: 8px;
+}
+.empty-deploy {
+  border: 1px dashed #3d5159;
+  border-radius: 5px;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  color: #71828c;
+  min-height: 94px;
+  background: #192630;
+}
+.empty-deploy span {
+  font-size: 16px;
+}
+.empty-deploy small {
+  font-size: 10px;
+}
+@media (max-width: 1000px) {
+  .battle-deck .unit-card canvas {
+    display: none;
+  }
+  .battle-deck .unit-text {
+    margin-left: 0;
+  }
+  .roster-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .hub header {
+    min-height: 70px;
+  }
+  .hub .edition {
+    display: none;
+  }
+  .home-hero {
+    padding: 26px 16px;
+    margin: 18px 0;
+  }
+  .home-hero h1 {
+    font-size: 34px;
+  }
+  .home-emblem {
+    display: none;
+  }
+  .home-hero p {
+    font-size: 11px;
+  }
+  .home-lineup {
+    padding: 12px;
+  }
+  .lineup-summary div {
+    padding: 8px 4px;
+  }
+  .lineup-summary b {
+    font-size: 9px;
+  }
+  .home-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .formation-slots {
+    gap: 5px;
+  }
+  .formation-slot {
+    height: 115px;
+    padding: 6px 2px;
+  }
+  .formation-slot canvas {
+    width: 42px;
+    height: 50px;
+  }
+  .formation-slot b {
+    font-size: 9px;
+  }
+  .formation-slot small {
+    font-size: 8px;
+  }
+  .formation-slot > span {
+    font-size: 7px;
+  }
+  .formation-slot > strong {
+    height: 50px;
+    font-size: 32px;
+  }
+  .roster-grid {
+    gap: 6px;
+  }
+  .roster-grid canvas {
+    width: 43px;
+    height: 52px;
+  }
+  .roster-grid button {
+    padding: 8px 4px;
+  }
+  .roster-grid h3 {
+    font-size: 11px;
+  }
+  .roster-grid small,
+  .roster-grid span {
+    font-size: 9px;
+  }
+  .formation-actions > span {
+    width: 100%;
+  }
+  .formation-actions {
+    gap: 8px;
+  }
+  .battle-screen header {
+    gap: 8px;
+  }
+  .battle-screen .brand {
+    font-size: 13px;
+    gap: 6px;
+  }
+  .battle-screen .brand small {
+    font-size: 6px;
+  }
+  .battle-screen .seal {
+    display: none;
+  }
+  .home-return {
+    font-size: 9px;
+    padding: 5px;
+  }
+  .battle-screen .pause {
+    font-size: 9px;
+    padding: 5px;
+    margin-left: 0;
+  }
+  .battle-deck {
+    gap: 4px;
+  }
+  .battle-deck .unit-card {
+    min-height: 99px;
+    padding: 5px 3px 8px;
+  }
+  .battle-deck .card-top span {
+    font-size: 7px;
+  }
+  .battle-deck .card-top b {
+    display: none;
+  }
+  .battle-deck .unit-text h3 {
+    font-size: 8px;
+    white-space: normal;
+    height: 22px;
+  }
+  .battle-deck .unit-text strong {
+    font-size: 14px;
+  }
+  .battle-deck .cost-label {
+    display: none;
+  }
+  .battle-deck .unit-text small,
+  .battle-deck .cooldown-label {
+    font-size: 7px;
+  }
+  .empty-deploy {
+    min-height: 99px;
+  }
+}
