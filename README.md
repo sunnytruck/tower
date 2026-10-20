@@ -35,15 +35,19 @@ npm run preview # distの確認
 - `src/data.ts`: 4種類の味方・5種類の敵の能力、コスト、再出撃時間、ステージ・出現時刻。
 - `src/engine.ts`: 描画に依存しない戦闘ロジック。時間の単位は秒。
 - `src/render.ts`: 戦場・敵のCanvas描画とダメージ表示。
-- `src/characterArt.ts`: 味方4種の専用衣装・シルエット・アニメーション。
-- `src/assets/ally-faces.png`: 架空の4人の実写風顔アトラス。差し替え方法は [素材説明](src/assets/README.md)。
+- `src/characterSprites.ts` / `src/characterAssets.ts`: 全身画像の共通設定・戦闘アニメーション。
+- `src/CharacterImage.tsx`: 既存・将来の画面で使う共通画像表示。
+- `src/characterArt.ts`: 画像欠落時のみ使う旧描画。
+- `public/characters/`: キャラ別の独立PNG。`src/assets/ally-faces.png` は旧描画のフォールバック用。
 - `src/main.tsx`: ホームと編成画面、画面移動とセッション内の編成状態。
 - `src/formation.ts`: 10枠の正規化・移動・解除。
 - `src/BattleScreen.tsx` / `src/Portrait.tsx` / `src/style.css`: 戦闘UI・共通キャラ表示・レスポンシブ表示。
 
-顔は特定の人物をモデルとしない架空の仮素材です。写真を `public/portraits/` に置き、
-ユニット定義の任意項目 `portrait` に `"./portraits/face.jpg"` のように指定すると、戦場とカードに反映されます。
-味方は顔画像の透明な輪郭を使い、キャラ別の衣装・武器と合成します。既存の作品の画像・UIは使用していません。
+味方4種は、それぞれ `public/characters/novice.png`・`monk.png`・`mage.png`・`keito.png` の全身透過画像で描画します。
+通常表示は旧来の顔アトラスやCanvas衣装合成を使いません。画像が読み込めない場合だけ旧描画へ戻ります。
+同名ファイルの置き換えだけで既存の全画面に反映でき、縦横比と全身表示を維持します。
+WebPへの変更と共通表示部品の使い方は [キャラクター画像の説明](public/characters/README.md) を参照してください。
+強化・ガチャの新機能は未実装ですが、共通表示部品を利用できる構造です。
 
 ## GitHub Pages
 

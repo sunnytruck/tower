@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { Formation } from "./formation";
-import { Portrait } from "./Portrait";
+import { CharacterImage } from "./CharacterImage";
 import { GameIcon } from "./GameIcon";
 import { Battle } from "./engine";
 import { UNITS, STAGE } from "./data";
@@ -266,7 +266,7 @@ export function BattleScreen({
                 </span>
                 <h3>{d.name}</h3>
                 <div className="slot-face">
-                  <Portrait kind={kind} face />
+                  <CharacterImage kind={kind} />
                   {cd > 0 && (
                     <>
                       <div

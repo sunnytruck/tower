@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BattleScreen } from "./BattleScreen";
-import { Portrait } from "./Portrait";
+import { CharacterImage } from "./CharacterImage";
 import { GameIcon, SacredLandscape } from "./GameIcon";
 import { ALLIES, UNITS, type Kind } from "./data";
 import { initialFormation, assignSlot, type Formation } from "./formation";
@@ -103,7 +103,7 @@ function App() {
             <div className="hero-character">
               <div className="hero-aura" />
               <div className="hero-pedestal" />
-              <Portrait kind="keito" hero />
+              <CharacterImage kind="keito" hero />
               <div className="hero-nameplate">
                 <small>じっと教の大いなる岩</small>
                 <strong>岩尊けいと</strong>
@@ -168,7 +168,7 @@ function App() {
               {formation.map((kind, i) => (
                 <div key={i} title={kind ? UNITS[kind].name : "未編成"}>
                   <span>{String(i + 1).padStart(2, "0")}</span>
-                  {kind ? <Portrait kind={kind} /> : <i>＋</i>}
+                  {kind ? <CharacterImage kind={kind} /> : <i>＋</i>}
                   <b>{kind ? UNITS[kind].name : "未編成"}</b>
                 </div>
               ))}
@@ -204,7 +204,7 @@ function App() {
                 <span>SLOT {String(i + 1).padStart(2, "0")}</span>
                 {kind ? (
                   <>
-                    <Portrait kind={kind} />
+                    <CharacterImage kind={kind} />
                     <b>{UNITS[kind].name}</b>
                     <small>
                       ¥ {UNITS[kind].cost} / {UNITS[kind].role}
@@ -237,7 +237,7 @@ function App() {
                     onClick={() => choose(kind)}
                     aria-label={`${d.name}を枠${selected + 1}に配置`}
                   >
-                    <Portrait kind={kind} />
+                    <CharacterImage kind={kind} />
                     <div>
                       <h3>{d.name}</h3>
                       <span>
