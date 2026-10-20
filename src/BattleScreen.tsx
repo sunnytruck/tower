@@ -5,16 +5,26 @@ import { GameIcon } from "./GameIcon";
 import { Battle } from "./engine";
 import { UNITS, STAGE } from "./data";
 import { draw } from "./render";
+import { levelOf, type Levels } from "./progression";
 import "./style.css";
 export function BattleScreen({
   lineup,
   onHome,
+  levels,
+  xp,
+  saveWarning,
+  onVictory,
 }: {
   lineup: Formation;
   onHome: () => void;
+  levels: Levels;
+  xp: number;
+  saveWarning: string;
+  onVictory: (id: string) => void;
 }) {
   const battle = useRef<Battle | null>(null);
-  if (!battle.current) battle.current = new Battle(lineup);
+  if (!battle.current) battle.current = new Battle(lineup, levels);
+  const settled = useRef(new WeakSet<Battle>());
   const canvas = useRef<HTMLCanvasElement>(null);
   const [, refresh] = useState(0);
   useEffect(() => {
@@ -26,6 +36,13 @@ export function BattleScreen({
       const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
       last = now;
       battle.current!.update(dt);
+      if (
+        battle.current!.status === "win" &&
+        !settled.current.has(battle.current!)
+      ) {
+        settled.current.add(battle.current!);
+        onVictory(battle.current!.id);
+      }
       draw(canvas.current!.getContext("2d")!, battle.current!, motion.matches);
       if (now - ui > 90) {
         refresh((v) => v + 1);
@@ -54,7 +71,7 @@ export function BattleScreen({
       resize.disconnect();
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, []);
+  }, [onVictory]);
   const b = battle.current!;
   const active = b.status === "playing";
   const nextWave = STAGE.waves[b.wave];
@@ -70,7 +87,7 @@ export function BattleScreen({
             ? "高速接近：壁役の出撃資金を確保"
             : "前衛：壁役と後衛を組み合わせよう";
   const retry = () => {
-    battle.current = new Battle(b.lineup);
+    battle.current = new Battle(b.lineup, b.levels);
     battle.current!.toggle();
     refresh((v) => v + 1);
   };
@@ -148,6 +165,11 @@ export function BattleScreen({
         </div>
       </header>
       <section className="battlefield" aria-label="戦場">
+        {saveWarning && (
+          <p className="battle-save-warning" role="alert">
+            {saveWarning}
+          </p>
+        )}
         <div
           className="wave-hint"
           aria-label={`次の敵出現：${waveAdvice}`}
@@ -204,6 +226,15 @@ export function BattleScreen({
                       ? "じっと教の新たな伝説が、ここに。"
                       : "壁役で守り、遠距離と範囲攻撃で押し返そう。"}
               </p>
+              {b.status === "win" && (
+                <div className="victory-xp" role="status">
+                  <GameIcon name="star" />
+                  <strong>+{STAGE.victoryXP} XP 獲得</strong>
+                  <small>
+                    所持XP {xp.toLocaleString()} / ホームから強化できます
+                  </small>
+                </div>
+              )}
               <button
                 className="primary"
                 onClick={() => {
@@ -247,13 +278,14 @@ export function BattleScreen({
                   <small>未編成</small>
                 </div>
               );
-            const d = UNITS[kind],
+            const d = b.stats[kind],
               cd = b.cooldowns[kind] ?? 0;
             return (
               <button
                 key={i}
                 className={`unit-card ${!active ? "idle" : cd > 0 ? "cooling" : b.money < d.cost ? "poor" : "available"}`}
                 aria-label={`${d.name}、出撃コスト${d.cost}円、${!active ? "戦闘停止中" : cd > 0 ? `再出撃まで${cd.toFixed(1)}秒` : b.money < d.cost ? `あと${Math.ceil(d.cost - b.money)}円必要` : "出撃可能"}`}
+                title={`${d.name} Lv.${levelOf(b.levels, kind)} / HP ${d.hp} / 攻撃力 ${d.damage}`}
                 disabled={!active || b.money < d.cost || cd > 0}
                 onClick={() => {
                   b.deploy(kind);

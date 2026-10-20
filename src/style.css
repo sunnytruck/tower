@@ -2152,3 +2152,451 @@ footer button {
     display: none;
   }
 }
+.xp-chip {
+  color: #466342;
+  border-color: #8da37c;
+}
+.save-notice {
+  background: #fff0cc;
+  border: 1px solid #bc8046;
+  border-radius: 7px;
+  padding: 10px 14px;
+  color: #8c4b30;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.battle-save-warning {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 6;
+  max-width: 95%;
+  background: #fff1d9e8;
+  color: #934b2e;
+  font-size: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+.victory-xp {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  margin: 0 0 17px;
+  border-radius: 10px;
+  background: #d9e7b8;
+  border: 1px solid #a9bd7c;
+  color: #57763d;
+}
+.victory-xp .game-icon {
+  width: 22px;
+  height: 22px;
+  color: #b18c37;
+}
+.victory-xp strong {
+  font-size: 23px;
+}
+.victory-xp small {
+  font-size: 10px;
+}
+.upgrade-screen {
+  padding: 20px 0;
+}
+.upgrade-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+.upgrade-heading h1 {
+  font: 900 34px var(--serif);
+  margin-top: 7px;
+}
+.upgrade-heading h1 span {
+  font: 12px system-ui;
+  color: #73856a;
+  margin-left: 16px;
+}
+.upgrade-wallet {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px;
+  background: #fff4cd;
+  border: 2px solid #bbaa6b;
+  border-radius: 17px 5px;
+  box-shadow: 0 4px #bbaa6b40;
+}
+.upgrade-wallet .game-icon {
+  color: #bd8f35;
+  width: 30px;
+  height: 30px;
+}
+.upgrade-wallet small {
+  display: block;
+  font-size: 9px;
+  color: #8b8f67;
+}
+.upgrade-wallet strong {
+  font-size: 25px;
+  color: #916e2c;
+  font-variant-numeric: tabular-nums;
+}
+.upgrade-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: center;
+}
+.upgrade-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 410px;
+  background: radial-gradient(
+    ellipse at center,
+    #fdf7d4,
+    #c9ddba70 65%,
+    transparent 72%
+  );
+  border-radius: 50%;
+  isolation: isolate;
+}
+.upgrade-art > .character-image,
+.upgrade-art > .character-fallback {
+  width: 85%;
+  height: 90%;
+  max-width: 420px;
+  object-fit: contain;
+  z-index: 1;
+  filter: drop-shadow(6px 10px 4px #315b3825);
+}
+.upgrade-halo {
+  position: absolute;
+  inset: 8% 15%;
+  border: 1px solid #9abb7d;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 12px #dbe6bb50,
+    0 0 0 32px #dbe6bb20;
+}
+.upgrade-art-caption {
+  position: absolute;
+  bottom: 0;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #66825b;
+  background: #f4f3d9b0;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+.upgrade-panel {
+  padding: 23px 28px;
+  border: 2px solid #a8b88a;
+  border-radius: 23px 7px;
+  background: linear-gradient(135deg, #fff9e4, #e9e9ce);
+  box-shadow: 0 6px #91a47a40;
+}
+.upgrade-panel h2 {
+  font: 900 27px var(--serif);
+  margin: 16px 0 8px;
+  letter-spacing: 2px;
+}
+.upgrade-level {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-weight: 800;
+  color: #527444;
+}
+.upgrade-level strong {
+  font-size: 42px;
+  line-height: 1.2;
+}
+.upgrade-level > span {
+  color: #8f9b7f;
+  font-size: 12px;
+}
+.upgrade-level > b {
+  margin-left: auto;
+  padding: 3px 9px;
+  font-size: 13px;
+  background: #e3cd83;
+  border-radius: 5px;
+}
+.upgrade-level-track {
+  height: 6px;
+  background: #d3dcb8;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px 0 18px;
+}
+.upgrade-level-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #71986b, #acbe7b);
+  transition: width 0.3s;
+}
+.compare-header,
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  align-items: center;
+  gap: 8px;
+}
+.compare-header {
+  font-size: 10px;
+  color: #8a957b;
+  padding: 0 0 7px;
+}
+.compare-row {
+  border-top: 1px solid #cbd3b3;
+  padding: 11px 0;
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+}
+.compare-row b {
+  font-size: 13px;
+}
+.compare-row strong {
+  color: #cd7540;
+}
+.upgrade-rule {
+  font-size: 10px;
+  color: #8a9679;
+  line-height: 1.8;
+  margin: 5px 0 16px;
+}
+.upgrade-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #7b8b6d;
+  margin-bottom: 10px;
+}
+.upgrade-price strong {
+  font-size: 21px;
+  color: #8e7239;
+}
+.upgrade-action {
+  width: 100%;
+}
+.upgrade-feedback {
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 15px;
+  color: #8b805b;
+}
+.upgrade-success {
+  font-size: 12px;
+  color: #64824c;
+  margin-top: 8px;
+  font-weight: 800;
+}
+.upgrade-gain {
+  position: absolute;
+  top: 18%;
+  z-index: 3;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 950;
+  color: #fff4ab;
+  text-shadow:
+    0 2px 0 #a67634,
+    0 0 18px #cfb34d;
+  animation: upgrade-rise 2.1s ease-out both;
+  pointer-events: none;
+}
+.upgrade-gain span {
+  display: block;
+  font-size: 15px;
+  margin-top: 10px;
+  color: #f8ffe9;
+  text-shadow: 0 2px #527444;
+}
+.upgrade-art:has(.upgrade-gain) > .portrait {
+  animation: upgrade-glow 0.65s ease-out;
+}
+.upgrade-roster {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 27px;
+}
+.upgrade-roster button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 10px;
+  background: #f4f1d9;
+  padding: 10px 14px;
+  border: 2px solid #b1bea0;
+  border-radius: 13px 4px;
+  box-shadow: 0 4px #9cac8940;
+}
+.upgrade-roster button.selected {
+  border-color: #d4834e;
+  background: #fff2cd;
+  box-shadow: 0 4px #b77342;
+}
+.upgrade-roster .portrait {
+  width: 64px;
+  height: 70px;
+  flex-shrink: 0;
+}
+.upgrade-roster b {
+  font-size: 13px;
+}
+.upgrade-roster small {
+  display: block;
+  font-size: 11px;
+  margin-top: 6px;
+  color: #83966f;
+}
+@keyframes upgrade-rise {
+  0% {
+    transform: translateY(25px) scale(0.8);
+    opacity: 0;
+  }
+  15%,
+  65% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-45px) scale(1.06);
+    opacity: 0;
+  }
+}
+@keyframes upgrade-glow {
+  30% {
+    filter: brightness(1.8) drop-shadow(0 0 24px #f5d367);
+    transform: scale(1.05);
+  }
+}
+@media (max-width: 800px) {
+  .upgrade-layout {
+    gap: 17px;
+  }
+  .upgrade-art {
+    height: 365px;
+  }
+  .upgrade-panel {
+    padding: 19px 18px;
+  }
+  .upgrade-roster {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 550px) {
+  .upgrade-page .player-hud .resource-chip:last-child {
+    display: none;
+  }
+  .upgrade-page .player-badge {
+    display: none;
+  }
+  .upgrade-page > header {
+    flex-wrap: nowrap;
+  }
+  .upgrade-page .player-hud {
+    margin-left: auto;
+  }
+  .upgrade-page > header > .pause {
+    margin-left: 0;
+  }
+  .upgrade-screen {
+    padding-top: 12px;
+  }
+  .upgrade-heading {
+    margin-bottom: 10px;
+    gap: 5px;
+  }
+  .upgrade-heading h1 {
+    font-size: 25px;
+  }
+  .upgrade-heading h1 span {
+    display: block;
+    margin: 5px 0 0;
+    font-size: 10px;
+  }
+  .upgrade-heading .eyebrow {
+    font-size: 8px;
+  }
+  .upgrade-wallet {
+    padding: 8px 11px;
+    gap: 6px;
+  }
+  .upgrade-wallet strong {
+    font-size: 22px;
+  }
+  .upgrade-wallet .game-icon {
+    width: 23px;
+    height: 23px;
+  }
+  .upgrade-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .upgrade-art {
+    height: 265px;
+  }
+  .upgrade-art > .character-image,
+  .upgrade-art > .character-fallback {
+    max-width: 280px;
+  }
+  .upgrade-panel {
+    padding: 20px;
+  }
+  .upgrade-panel h2 {
+    font-size: 23px;
+    margin-top: 12px;
+  }
+  .upgrade-roster {
+    gap: 7px;
+    margin-top: 20px;
+  }
+  .upgrade-roster button {
+    padding: 8px 6px;
+    gap: 5px;
+  }
+  .upgrade-roster .portrait {
+    width: 44px;
+    height: 58px;
+  }
+  .upgrade-roster b {
+    font-size: 10px;
+  }
+  .upgrade-roster small {
+    font-size: 10px;
+  }
+  .victory-xp strong {
+    font-size: 19px;
+  }
+  .victory-xp small {
+    font-size: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .upgrade-gain {
+    opacity: 1;
+  }
+  .upgrade-art:has(.upgrade-gain) > .portrait {
+    animation: none;
+  }
+}
+/* Decorative home art must not intercept the mobile start button. */
+.hero-character {
+  pointer-events: none;
+}
+/* Give the portrait a bounded grid track even for very tall source images. */
+.upgrade-art {
+  min-width: 0;
+  grid-template-rows: minmax(0, 1fr);
+}
+.upgrade-art > .character-image,
+.upgrade-art > .character-fallback {
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+}

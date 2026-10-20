@@ -1,11 +1,14 @@
 import { UNITS, STAGE, ALLIES, type Kind } from "./data.ts";
 import { normalizeFormation } from "./formation.ts";
+import { unitStats, normalizeLevels, type Levels } from "./progression.ts";
+import type { Stats } from "./data.ts";
 export interface Unit {
   id: number;
   kind: Kind;
   side: 1 | -1;
   x: number;
   hp: number;
+  maxHP: number;
   attack: number;
   flash: number;
   pose: number;
@@ -30,9 +33,21 @@ export interface Impact {
   color: string;
 }
 export class Battle {
+  readonly id = crypto.randomUUID();
+  readonly levels: Readonly<Levels>;
+  readonly stats: Readonly<Record<Kind, Stats>>;
   readonly lineup: readonly (Kind | null)[];
-  constructor(lineup: readonly (Kind | null)[] = ALLIES) {
+  constructor(lineup: readonly (Kind | null)[] = ALLIES, levels: Levels = {}) {
     this.lineup = Object.freeze(normalizeFormation(lineup));
+    this.levels = Object.freeze(normalizeLevels(levels));
+    this.stats = Object.freeze(
+      Object.fromEntries(
+        (Object.keys(UNITS) as Kind[]).map((kind) => [
+          kind,
+          Object.freeze(unitStats(kind, this.levels)),
+        ]),
+      ) as Record<Kind, Stats>,
+    );
   }
   impacts: Impact[] = [];
   hitStop = 0;
@@ -74,7 +89,8 @@ export class Battle {
       kind,
       side,
       x: side === 1 ? 100 : 1300,
-      hp: UNITS[kind].hp,
+      hp: this.stats[kind].hp,
+      maxHP: this.stats[kind].hp,
       attack: 0.3,
       flash: 0,
       pose: 0,
@@ -85,7 +101,7 @@ export class Battle {
     return u;
   }
   deploy(kind: Kind) {
-    const d = UNITS[kind];
+    const d = this.stats[kind];
     if (
       this.status !== "playing" ||
       !this.lineup.includes(kind) ||
@@ -128,7 +144,7 @@ export class Battle {
         u.dead += dt;
         continue;
       }
-      const d = UNITS[u.kind];
+      const d = this.stats[u.kind];
       u.attack -= combatDt;
       const targets = this.units
         .filter(

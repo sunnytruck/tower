@@ -167,6 +167,7 @@ export const STAGE = {
   subtitle: "第一章 / 静寂を破る者",
   width: 1400,
   baseHP: 3200,
+  victoryXP: 300,
   income: 30,
   startingMoney: 300,
   maxMoney: 1800,

@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BattleScreen } from "./BattleScreen";
 import { CharacterImage } from "./CharacterImage";
 import { GameIcon, SacredLandscape } from "./GameIcon";
-import { ALLIES, UNITS, type Kind } from "./data";
+import { ALLIES, UNITS, STAGE, type Kind } from "./data";
 import { initialFormation, assignSlot, type Formation } from "./formation";
 import "./style.css";
+import { useProgress } from "./useProgress";
+import { awardVictory, upgradeCharacter } from "./progressStore";
+import { unitStats, levelOf, type Levels } from "./progression";
+import { UpgradeScreen } from "./UpgradeScreen";
 
-type Page = "home" | "formation" | "battle";
+type Page = "home" | "formation" | "battle" | "upgrade";
 function App() {
   const [page, setPage] = useState<Page>("home");
-  const [formation, setFormation] = useState<Formation>(initialFormation);
+  const { progress, update, warning } = useProgress();
+  const formation = progress.formation;
+  const [battleLevels, setBattleLevels] = useState<Levels>(() => ({
+    ...progress.levels,
+  }));
+  const onVictory = useCallback(
+    (id: string) => {
+      update((data) => awardVictory(data, id, "win", STAGE.victoryXP));
+    },
+    [update],
+  );
   const [selected, setSelected] = useState(0);
   const [battleLineup, setBattleLineup] = useState<Formation>(initialFormation);
   const [notice, setNotice] = useState("");
@@ -18,20 +32,33 @@ function App() {
   function start() {
     if (!count) return;
     setBattleLineup([...formation]);
+    setBattleLevels({ ...progress.levels });
     setPage("battle");
   }
   function choose(kind: Kind | null) {
-    setFormation((current) => assignSlot(current, selected, kind));
+    update((data) => ({
+      ...data,
+      formation: assignSlot(data.formation, selected, kind),
+    }));
     setNotice(
       `枠${selected + 1}を${kind ? UNITS[kind].name : "未編成"}に変更しました`,
     );
   }
   if (page === "battle")
     return (
-      <BattleScreen lineup={battleLineup} onHome={() => setPage("home")} />
+      <BattleScreen
+        lineup={battleLineup}
+        levels={battleLevels}
+        xp={progress.xp}
+        saveWarning={warning}
+        onVictory={onVictory}
+        onHome={() => setPage("home")}
+      />
     );
   return (
-    <main className={`hub ${page === "home" ? "home-page" : "formation-page"}`}>
+    <main
+      className={`hub ${page === "home" ? "home-page" : page === "upgrade" ? "upgrade-page" : "formation-page"}`}
+    >
       <header>
         <a
           className="brand"
@@ -53,11 +80,10 @@ function App() {
               旅の信者<small>GUEST</small>
             </span>
           </span>
-          <span className="resource-chip" title="XPはPhase 2で実装予定">
+          <span className="resource-chip xp-chip" title="勝利で獲得したXP">
             <GameIcon name="star" />
             <span>
-              XP <b>—</b>
-              <small>準備中</small>
+              XP <b>{progress.xp.toLocaleString()}</b>
             </span>
           </span>
           <span className="resource-chip" title="ガチャ通貨はPhase 3で実装予定">
@@ -74,7 +100,18 @@ function App() {
           </button>
         )}
       </header>
-      {page === "home" ? (
+      {warning && (
+        <p className="save-notice" role="alert">
+          {warning}
+        </p>
+      )}
+      {page === "upgrade" ? (
+        <UpgradeScreen
+          xp={progress.xp}
+          levels={progress.levels}
+          onUpgrade={(kind) => update((data) => upgradeCharacter(data, kind))}
+        />
+      ) : page === "home" ? (
         <>
           <section className="home-hero">
             <SacredLandscape />
@@ -134,8 +171,14 @@ function App() {
               <b>編成</b>
               <small>信者を集めよう</small>
             </button>
+            <button className="menu-upgrade" onClick={() => setPage("upgrade")}>
+              <span className="menu-medallion">
+                <GameIcon name="upgrade" />
+              </span>
+              <b>強化</b>
+              <small>XPでレベルアップ</small>
+            </button>
             {[
-              { name: "強化", icon: "upgrade" },
               { name: "ガチャ", icon: "gacha" },
               { name: "図鑑", icon: "book" },
             ].map((item) => (
@@ -174,7 +217,8 @@ function App() {
               ))}
             </div>
             <p className="session-note">
-              編成は画面移動中に保持されます。ページ更新後の保存は準備中です。
+              XP・キャラレベル・編成は自動保存されます。戦闘勝利で
+              {STAGE.victoryXP}XP獲得。
             </p>
           </section>
         </>
@@ -229,7 +273,7 @@ function App() {
             </div>
             <div className="roster-grid">
               {ALLIES.map((kind) => {
-                const d = UNITS[kind];
+                const d = unitStats(kind, progress.levels);
                 const pos = formation.indexOf(kind);
                 return (
                   <button
@@ -239,7 +283,10 @@ function App() {
                   >
                     <CharacterImage kind={kind} />
                     <div>
-                      <h3>{d.name}</h3>
+                      <h3>
+                        {d.name}{" "}
+                        <small>Lv.{levelOf(progress.levels, kind)}</small>
+                      </h3>
                       <span>
                         {d.role} / ¥ {d.cost}
                       </span>

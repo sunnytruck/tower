@@ -28,7 +28,7 @@ export function figure(
       c.fillStyle = "#283b33";
       c.fillRect(-22, top, 44, 4);
       c.fillStyle = "#9ed7bc";
-      c.fillRect(-22, top, (44 * Math.max(0, u.hp)) / d.hp, 4);
+      c.fillRect(-22, top, (44 * Math.max(0, u.hp)) / (u.maxHP ?? d.hp), 4);
     }
     c.restore();
     return;
@@ -145,7 +145,7 @@ export function figure(
     c.fillStyle = "#28313a";
     c.fillRect(-21, -101, 42, 4);
     c.fillStyle = u.side === 1 ? "#9ed7bc" : "#ed9a88";
-    c.fillRect(-21, -101, (42 * u.hp) / d.hp, 4);
+    c.fillRect(-21, -101, (42 * u.hp) / (u.maxHP ?? d.hp), 4);
   }
   c.restore();
 }

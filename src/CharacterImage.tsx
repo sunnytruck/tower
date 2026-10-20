@@ -64,6 +64,7 @@ function Fallback({ kind, hero }: { kind: Kind; hero: boolean }) {
           side: 1,
           x: canvas.width / 2,
           hp: UNITS[kind].hp,
+          maxHP: UNITS[kind].hp,
           attack: 0,
           pose: 0,
           flash: 0,
