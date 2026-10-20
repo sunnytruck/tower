@@ -6,11 +6,13 @@ export function figure(
   u: Unit,
   t: number,
   y = 295,
+  displayScale = 1,
+  showHealth = true,
 ) {
   const d = UNITS[u.kind];
   c.save();
   c.translate(u.x + u.recoil, y);
-  c.scale(d.size, d.size);
+  c.scale(d.size * displayScale, d.size * displayScale);
   if (u.hp <= 0) {
     c.globalAlpha = Math.max(0, 1 - u.dead / 0.55);
     c.rotate(u.side * u.dead * 5);
@@ -60,6 +62,30 @@ export function figure(
     }
     c.restore();
   }
+  if (u.kind === "keito") {
+    // Stone shoulder armour and ceremonial cape, drawn from original geometry.
+    c.fillStyle = "#c66d42";
+    c.beginPath();
+    c.moveTo(-12, -40);
+    c.lineTo(-27, -5);
+    c.lineTo(27, -5);
+    c.lineTo(12, -40);
+    c.fill();
+    c.fillStyle = "#f1d485";
+    c.beginPath();
+    c.roundRect(-13, -36, 26, 24, 5);
+    c.fill();
+    c.fillStyle = "#677f75";
+    for (const x of [-19, 12]) {
+      c.beginPath();
+      c.roundRect(x, -40, 9, 13, 2);
+      c.fill();
+    }
+    c.fillStyle = "#f9efb5";
+    c.beginPath();
+    c.arc(0, -27, 4, 0, Math.PI * 2);
+    c.fill();
+  }
   // Fictional clay portrait; replace through the optional portrait URL in data.ts.
   const g = c.createRadialGradient(-7, -65, 1, 0, -57, 29);
   g.addColorStop(0, "#f8dcc1");
@@ -107,6 +133,22 @@ export function figure(
   c.textAlign = "center";
   c.fillStyle = "#1e2934";
   c.fillText(d.symbol, 0, -73);
+  if (u.kind === "keito") {
+    c.fillStyle = "#d8b36d";
+    c.beginPath();
+    c.moveTo(-24, -83);
+    c.lineTo(-20, -95);
+    c.lineTo(-8, -88);
+    c.lineTo(0, -102);
+    c.lineTo(9, -88);
+    c.lineTo(21, -95);
+    c.lineTo(24, -83);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "#8b714a";
+    c.stroke();
+  }
+
   if (u.pose) {
     c.strokeStyle = "#ffe4a3";
     c.lineWidth = 3;
@@ -117,7 +159,7 @@ export function figure(
     c.font = "26px sans-serif";
     c.fillText("✦", u.side * 40, -30);
   }
-  if (u.hp > 0) {
+  if (showHealth && u.hp > 0) {
     c.fillStyle = "#28313a";
     c.fillRect(-21, -101, 42, 4);
     c.fillStyle = u.side === 1 ? "#9ed7bc" : "#ed9a88";
@@ -131,22 +173,25 @@ export function draw(
   reducedMotion = false,
 ) {
   const w = STAGE.width;
-  c.clearRect(0, 0, w, 380);
+  const height = c.canvas.height;
+  c.clearRect(0, 0, w, height);
   c.save();
   if (!reducedMotion && b.status === "playing")
     c.translate(
       Math.sin(b.fxTime * 105) * b.shake,
       Math.cos(b.fxTime * 83) * b.shake * 0.5,
     );
-  const sky = c.createLinearGradient(0, 0, 0, 380);
-  sky.addColorStop(0, "#d9e4df");
-  sky.addColorStop(1, "#f0e7cc");
+  const sky = c.createLinearGradient(0, 0, 0, height);
+  sky.addColorStop(0, "#a9d8d3");
+  sky.addColorStop(1, "#fff1bf");
   c.fillStyle = sky;
-  c.fillRect(0, 0, w, 380);
+  c.fillRect(0, 0, w, height);
   c.fillStyle = "#f8edd1";
   c.beginPath();
   c.arc(1050, 78, 40, 0, 7);
   c.fill();
+  // Extend the sky to the viewport, keeping all combat positions unchanged.
+  c.translate(0, height - 380);
   for (let layer = 0; layer < 3; layer++) {
     c.fillStyle = ["#bdccbd", "#a5b9aa", "#819e8e"][layer];
     c.beginPath();
@@ -196,7 +241,8 @@ export function draw(
     c.fill();
     c.restore();
   }
-  for (const u of [...b.units].sort((a, b) => a.x - b.x)) figure(c, u, b.time);
+  for (const u of [...b.units].sort((a, b) => a.x - b.x))
+    figure(c, u, b.time, 295, 1.4);
   for (const e of b.impacts) {
     const progress = 1 - e.life / e.duration;
     const radius = (e.death ? 25 : 18) * e.power * (0.3 + progress * 2);

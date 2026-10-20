@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { Formation } from "./formation";
 import { Portrait } from "./Portrait";
+import { GameIcon } from "./GameIcon";
 import { Battle } from "./engine";
 import { UNITS, STAGE } from "./data";
 import { draw } from "./render";
@@ -33,6 +34,16 @@ export function BattleScreen({
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
+    const resize = new ResizeObserver(() => {
+      const element = canvas.current!;
+      const bounds = element.getBoundingClientRect();
+      if (bounds.width && bounds.height)
+        element.height = Math.max(
+          300,
+          Math.round((1400 * bounds.height) / bounds.width),
+        );
+    });
+    resize.observe(canvas.current!);
     const visibility = () => {
       if (document.hidden && battle.current!.status === "playing")
         battle.current!.toggle();
@@ -40,12 +51,24 @@ export function BattleScreen({
     document.addEventListener("visibilitychange", visibility);
     return () => {
       cancelAnimationFrame(frame);
+      resize.disconnect();
       document.removeEventListener("visibilitychange", visibility);
     };
   }, []);
   const b = battle.current!;
   const active = b.status === "playing";
   const nextWave = STAGE.waves[b.wave];
+  const waveAdvice = !nextWave
+    ? "敵の砦を破壊しよう"
+    : nextWave.kind === "sniper"
+      ? "遠距離支援：壁役で攻撃を受けよう"
+      : nextWave.kind === "bomber"
+        ? "範囲攻撃：遠距離から撃破しよう"
+        : nextWave.kind === "heavy"
+          ? "高耐久：後衛の火力で突破しよう"
+          : nextWave.kind === "runner"
+            ? "高速接近：壁役の出撃資金を確保"
+            : "前衛：壁役と後衛を組み合わせよう";
   const retry = () => {
     battle.current = new Battle(b.lineup);
     battle.current!.toggle();
@@ -53,77 +76,18 @@ export function BattleScreen({
   };
   return (
     <main className="battle-screen">
-      <header>
-        <a className="brand" href="./">
-          <span className="seal">岩</span>
+      <header className="battle-hud">
+        <div className="hud-stage">
+          <GameIcon name="rock" />
           <div>
-            じっと教大戦争<small>JITTO : THE STONE FRONT</small>
-          </div>
-        </a>
-        <span className="edition">TACTICAL DEFENSE / 01</span>
-        <button className="home-return" onClick={onHome}>
-          {b.status === "playing" || b.status === "paused"
-            ? "撤退してホーム"
-            : "ホームへ"}
-        </button>
-        <button
-          className="pause"
-          onClick={() => {
-            b.toggle();
-            refresh((v) => v + 1);
-          }}
-          disabled={b.status === "win" || b.status === "lose"}
-        >
-          {active ? "Ⅱ 一時停止" : b.status === "ready" ? "▷ 開始" : "▷ 再開"}
-        </button>
-      </header>
-      <section className="stage-heading">
-        <div>
-          <span className="eyebrow">CHAPTER 01 ━ THE SACRED GROUND</span>
-          <h1>
-            {STAGE.name}
-            <span>静寂を破る者</span>
-          </h1>
-        </div>
-        <div className="wave-hint" aria-label="次の敵出現">
-          <small>次の襲来</small>
-          <strong>
-            {nextWave
-              ? `${UNITS[nextWave.kind].name} / ${Math.max(0, Math.ceil(nextWave.at - b.time))}秒後`
-              : "敵の増援なし"}
-          </strong>
-          <span>
-            {nextWave
-              ? nextWave.kind === "sniper"
-                ? "遠距離支援：壁役で攻撃を受けよう"
-                : nextWave.kind === "bomber"
-                  ? "範囲攻撃：遠距離から撃破しよう"
-                  : nextWave.kind === "heavy"
-                    ? "高耐久：後衛の火力で突破しよう"
-                    : nextWave.kind === "runner"
-                      ? "高速接近：壁役の出撃資金を確保"
-                      : "前衛：壁役と後衛を組み合わせよう"
-              : "敵の砦を破壊しよう"}
-          </span>
-        </div>
-        <div className="funds">
-          <small>
-            所持金 <span>+{STAGE.income} / 秒</span>
-          </small>
-          <strong>
-            {Math.floor(b.money).toLocaleString()}
-            <i>円</i>
-          </strong>
-          <div className="meter">
-            <i style={{ width: `${(b.money / STAGE.maxMoney) * 100}%` }} />
+            <small>STAGE 01</small>
+            <b>{STAGE.name}</b>
           </div>
         </div>
-      </section>
-      <section className="battlefield" aria-label="戦場">
-        <div className="battle-info">
-          <Base label="じっと教 総本山" hp={b.leftHP} />
+        <div className="hud-vitals">
+          <Base label="総本山" hp={b.leftHP} />
           <div className="timer">
-            STAGE 01
+            <small>経過時間</small>
             <strong>
               {Math.floor(b.time / 60)
                 .toString()
@@ -133,11 +97,71 @@ export function BattleScreen({
                 .toString()
                 .padStart(2, "0")}
             </strong>
-            <small>
-              敵軍 {b.wave} / {STAGE.waves.length}
-            </small>
           </div>
-          <Base label="敵軍の砦" hp={b.rightHP} enemy />
+          <Base label="敵の砦" hp={b.rightHP} enemy />
+        </div>
+        <div className="funds">
+          <GameIcon name="star" />
+          <div>
+            <small>
+              所持金 <span>+{STAGE.income}/秒</span>
+            </small>
+            <strong>
+              {Math.floor(b.money).toLocaleString()}
+              <i>円</i>
+            </strong>
+            <span className="fund-limit">
+              上限 {STAGE.maxMoney.toLocaleString()}
+            </span>
+          </div>
+        </div>
+        <div className="battle-actions">
+          <button
+            className="home-return"
+            onClick={onHome}
+            aria-label={
+              b.status === "playing" || b.status === "paused"
+                ? "撤退してホーム"
+                : "ホームへ"
+            }
+            title="ホームへ戻ると現在の戦闘は終了します"
+          >
+            <GameIcon name="home" />
+            <span>ホーム</span>
+          </button>
+          <button
+            className="pause"
+            onClick={() => {
+              b.toggle();
+              refresh((v) => v + 1);
+            }}
+            disabled={b.status === "win" || b.status === "lose"}
+            aria-label={
+              active ? "Ⅱ 一時停止" : b.status === "ready" ? "▷ 開始" : "▷ 再開"
+            }
+          >
+            <b>{active ? "Ⅱ" : "▶"}</b>
+            <span>
+              {active ? "一時停止" : b.status === "ready" ? "開始" : "再開"}
+            </span>
+          </button>
+        </div>
+      </header>
+      <section className="battlefield" aria-label="戦場">
+        <div
+          className="wave-hint"
+          aria-label={`次の敵出現：${waveAdvice}`}
+          title={waveAdvice}
+        >
+          <span className="wave-pip" />
+          <strong>
+            {nextWave
+              ? `${UNITS[nextWave.kind].name} / ${Math.max(0, Math.ceil(nextWave.at - b.time))}秒後`
+              : "敵の増援なし"}
+          </strong>
+          <small>
+            敵軍 {b.wave}/{STAGE.waves.length}
+          </small>
         </div>
         <div
           className="world-viewport"
@@ -148,7 +172,7 @@ export function BattleScreen({
             className="world"
             ref={canvas}
             width={1400}
-            height={380}
+            height={500}
             aria-label="味方は左から、敵は右から進軍します"
           />
         </div>
@@ -203,9 +227,12 @@ export function BattleScreen({
       <section className="deployment">
         <div className="deploy-title">
           <h2>
-            信者を召集 <small>DEPLOY UNITS</small>
+            <GameIcon name="formation" />
+            信者を召集 <small>10 SLOTS</small>
           </h2>
-          <span>自動戦闘 / 戦場は左右にスワイプ</span>
+          <span>
+            信者をタップして出撃 <i> / 戦場は左右にスワイプ</i>
+          </span>
         </div>
         <div className="cards battle-deck">
           {b.lineup.map((kind, i) => {
@@ -225,7 +252,7 @@ export function BattleScreen({
             return (
               <button
                 key={i}
-                className={`unit-card ${active && b.money >= d.cost && cd <= 0 ? "available" : "unavailable"}`}
+                className={`unit-card ${!active ? "idle" : cd > 0 ? "cooling" : b.money < d.cost ? "poor" : "available"}`}
                 aria-label={`${d.name}、出撃コスト${d.cost}円、${!active ? "戦闘停止中" : cd > 0 ? `再出撃まで${cd.toFixed(1)}秒` : b.money < d.cost ? `あと${Math.ceil(d.cost - b.money)}円必要` : "出撃可能"}`}
                 disabled={!active || b.money < d.cost || cd > 0}
                 onClick={() => {
@@ -234,35 +261,37 @@ export function BattleScreen({
                 }}
                 style={{ "--accent": d.color } as React.CSSProperties}
               >
-                <div className="card-top">
-                  <span>
-                    {String(i + 1).padStart(2, "0")} / {d.role}
-                  </span>
-                  <b>{d.area ? "範囲" : "単体"}</b>
+                <span className="slot-number">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3>{d.name}</h3>
+                <div className="slot-face">
+                  <Portrait kind={kind} face />
+                  {cd > 0 && (
+                    <>
+                      <div
+                        className="cooldown-curtain"
+                        style={{ height: `${(cd / d.cooldown) * 100}%` }}
+                      />
+                      <span className="cooldown-count">
+                        {cd.toFixed(1)}
+                        <small>秒</small>
+                      </span>
+                    </>
+                  )}
                 </div>
-                <Portrait kind={kind} />
-                <div className="unit-text">
-                  <h3>{d.name}</h3>
-                  <strong>
-                    <span className="cost-label">出撃</span> ¥ {d.cost}
-                  </strong>
-                  <span className="cooldown-label">
-                    {cd > 0
-                      ? `再出撃 ${cd.toFixed(1)} / ${d.cooldown}秒`
-                      : `再出撃間隔 ${d.cooldown}秒`}
-                  </span>
-                  <small>
-                    {!active
-                      ? b.status === "ready"
-                        ? "開始待ち"
-                        : "戦闘停止中"
+                <strong className="slot-cost">¥ {d.cost}</strong>
+                <small className="slot-status">
+                  {!active
+                    ? b.status === "ready"
+                      ? "開始待ち"
+                      : "停止中"
+                    : cd > 0
+                      ? "再出撃待ち"
                       : b.money < d.cost
                         ? `あと ¥${Math.ceil(d.cost - b.money)}`
-                        : cd > 0
-                          ? "再出撃待ち"
-                          : "● 出撃可能"}
-                  </small>
-                </div>
+                        : "● 出撃可能"}
+                </small>
                 <div className="cooldown">
                   <i style={{ width: `${(1 - cd / d.cooldown) * 100}%` }} />
                 </div>
@@ -272,13 +301,9 @@ export function BattleScreen({
         </div>
       </section>
       <footer>
-        <span>
-          <b>遊び方</b> 壁役を前線へ。後衛を守って敵拠点HPを0にしよう。
-        </span>
+        <span>壁役で守り、後衛で突破。</span>
         <button onClick={retry}>↻ リトライ</button>
-        <span className="placeholder">
-          架空の仮キャラクター / 顔素材は差し替え可能
-        </span>
+        <span className="placeholder">じっと教大戦争</span>
       </footer>
     </main>
   );

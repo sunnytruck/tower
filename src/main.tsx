@@ -2,7 +2,8 @@ import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BattleScreen } from "./BattleScreen";
 import { Portrait } from "./Portrait";
-import { ALLIES, UNITS, STAGE, type Kind } from "./data";
+import { GameIcon, SacredLandscape } from "./GameIcon";
+import { ALLIES, UNITS, type Kind } from "./data";
 import { initialFormation, assignSlot, type Formation } from "./formation";
 import "./style.css";
 
@@ -30,7 +31,7 @@ function App() {
       <BattleScreen lineup={battleLineup} onHome={() => setPage("home")} />
     );
   return (
-    <main className="hub">
+    <main className={`hub ${page === "home" ? "home-page" : "formation-page"}`}>
       <header>
         <a
           className="brand"
@@ -45,7 +46,28 @@ function App() {
             じっと教大戦争<small>JITTO : THE STONE FRONT</small>
           </div>
         </a>
-        <span className="edition">総本山 / PHASE 01</span>
+        <div className="player-hud" aria-label="プレイヤー情報と今後の通貨表示">
+          <span className="player-badge">
+            <GameIcon name="rock" />
+            <span>
+              旅の信者<small>GUEST</small>
+            </span>
+          </span>
+          <span className="resource-chip" title="XPはPhase 2で実装予定">
+            <GameIcon name="star" />
+            <span>
+              XP <b>—</b>
+              <small>準備中</small>
+            </span>
+          </span>
+          <span className="resource-chip" title="ガチャ通貨はPhase 3で実装予定">
+            <GameIcon name="gacha" />
+            <span>
+              信仰石 <b>—</b>
+              <small>準備中</small>
+            </span>
+          </span>
+        </div>
         {page !== "home" && (
           <button className="pause" onClick={() => setPage("home")}>
             ホームへ
@@ -55,67 +77,106 @@ function App() {
       {page === "home" ? (
         <>
           <section className="home-hero">
-            <div>
-              <span className="eyebrow">WELCOME TO THE SACRED GROUND</span>
+            <SacredLandscape />
+            <div className="home-title">
+              <span className="ribbon">じっと教 総本山</span>
               <h1>
-                総本山<span>信者を集め、戦場へ。</span>
+                じっと、
+                <br />
+                世界を動かせ。
               </h1>
-              <p>壁役と後衛を組み合わせ、自分の布陣で岩の聖地に挑もう。</p>
-              <button className="primary" disabled={!count} onClick={start}>
-                岩の聖地へ出陣 →
+              <p>小さな信仰。でっかい一撃。</p>
+              <button
+                className="primary embark"
+                disabled={!count}
+                onClick={start}
+              >
+                <GameIcon name="battle" />
+                岩の聖地へ出陣 <span>▶</span>
               </button>
               {!count && (
-                <p role="status">先に編成で1体以上を選んでください。</p>
+                <p className="empty-warning" role="status">
+                  編成で1体以上を選んでください
+                </p>
               )}
             </div>
-            <div className="home-emblem" aria-hidden="true">
-              岩<small>じっと教</small>
+            <div className="hero-character">
+              <div className="hero-aura" />
+              <div className="hero-pedestal" />
+              <Portrait kind="keito" hero />
+              <div className="hero-nameplate">
+                <small>じっと教の大いなる岩</small>
+                <strong>岩尊けいと</strong>
+                <span>「動かざること、岩のごとく。」</span>
+              </div>
             </div>
+            <span className="scene-stamp">
+              岩の聖地
+              <br />
+              <b>01</b>
+            </span>
           </section>
+          <nav className="home-menu" aria-label="メインメニュー">
+            <button className="menu-battle" onClick={start} disabled={!count}>
+              <span className="menu-medallion">
+                <GameIcon name="battle" />
+              </span>
+              <b>戦闘</b>
+              <small>いざ、出陣！</small>
+            </button>
+            <button
+              className="menu-formation"
+              onClick={() => setPage("formation")}
+            >
+              <span className="menu-medallion">
+                <GameIcon name="formation" />
+              </span>
+              <b>編成</b>
+              <small>信者を集めよう</small>
+            </button>
+            {[
+              { name: "強化", icon: "upgrade" },
+              { name: "ガチャ", icon: "gacha" },
+              { name: "図鑑", icon: "book" },
+            ].map((item) => (
+              <button key={item.name} className={`menu-${item.icon}`} disabled>
+                <span className="menu-medallion">
+                  <GameIcon name={item.icon} />
+                </span>
+                <b>{item.name}</b>
+                <small>
+                  <GameIcon name="lock" />
+                  準備中
+                </small>
+              </button>
+            ))}
+          </nav>
           <section className="home-lineup">
             <div className="deploy-title">
               <h2>
-                現在の編成 <small>{count} / 10 枠</small>
+                <GameIcon name="formation" />
+                出陣の仲間 <small>{count} / 10</small>
               </h2>
-              <button className="pause" onClick={() => setPage("formation")}>
+              <button
+                className="text-button"
+                onClick={() => setPage("formation")}
+              >
                 編成を変更 →
               </button>
             </div>
             <div className="lineup-summary">
               {formation.map((kind, i) => (
-                <div key={i}>
+                <div key={i} title={kind ? UNITS[kind].name : "未編成"}>
                   <span>{String(i + 1).padStart(2, "0")}</span>
+                  {kind ? <Portrait kind={kind} /> : <i>＋</i>}
                   <b>{kind ? UNITS[kind].name : "未編成"}</b>
                 </div>
               ))}
             </div>
             <p className="session-note">
-              編成は画面の移動・リトライ中に保持されます。ページ更新後の保存はPhase
-              3で対応予定です。
+              編成は画面移動中に保持されます。ページ更新後の保存は準備中です。
             </p>
           </section>
-          <nav className="home-menu" aria-label="メインメニュー">
-            <button onClick={start} disabled={!count}>
-              <b>01 戦闘</b>
-              <span>{STAGE.name} / 1ステージ</span>
-            </button>
-            <button onClick={() => setPage("formation")}>
-              <b>02 編成</b>
-              <span>10枠・既存の4種類を配置</span>
-            </button>
-            {[
-              { name: "強化", phase: 2, desc: "XPで能力を伸ばす" },
-              { name: "ガチャ", phase: 3, desc: "新たな信者と出会う" },
-              { name: "図鑑", phase: 5, desc: "信者の姿と能力を知る" },
-            ].map((item) => (
-              <button key={item.name} disabled>
-                <b>{item.name}</b>
-                <span>
-                  {item.desc} / Phase {item.phase}予定
-                </span>
-              </button>
-            ))}
-          </nav>
         </>
       ) : (
         <>
@@ -126,9 +187,6 @@ function App() {
             </h1>
             <p>
               枠を選んで、下の信者を配置。同じ信者を選ぶとその枠へ移動します。
-            </p>
-            <p className="session-note">
-              現在は既存4種を使用します。空き枠があっても出陣可能です。重複編成はできません。
             </p>
           </section>
           <section className="formation-slots" aria-label="10枠の編成">
@@ -215,7 +273,7 @@ function App() {
         </>
       )}
       <footer>
-        <span>PHASE 01 / ホーム・10枠編成・戦闘接続</span>
+        <span>じっと教大戦争 / THE STONE FRONT</span>
         <span className="placeholder">
           架空の仮キャラクター / オリジナル作品
         </span>
