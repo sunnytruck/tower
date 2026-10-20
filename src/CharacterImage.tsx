@@ -38,7 +38,7 @@ export function CharacterImage({ kind, hero = false }: CharacterImageProps) {
         CHARACTER_ASSETS[kind].quality === "draft-background"
           ? "仮素材：背景・ラベルあり。透過版への差し替え予定。"
           : CHARACTER_ASSETS[kind].quality === "placeholder"
-            ? "仮素材：鐘守り専用のオリジナルSVG"
+            ? "仮素材：岩石軍団の専用SVG。実写風の完成画像は後から差し替え可能。"
             : undefined
       }
       onLoad={() => refresh((v) => v + 1)}

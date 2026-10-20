@@ -2,6 +2,9 @@ import { useState } from "react";
 import { ALLIES, UNITS, type Kind } from "./data";
 import { CharacterImage } from "./CharacterImage";
 import { GameIcon } from "./GameIcon";
+import { CharacterMaterialNote, CharacterStats } from "./CharacterStats";
+import { RosterTools, useRosterFilter } from "./RosterTools";
+import { characterEntry, RARITIES } from "./gacha";
 import {
   MAX_LEVEL,
   levelOf,
@@ -27,6 +30,7 @@ export function UpgradeScreen({
     hp: number;
     damage: number;
   } | null>(null);
+  const filter = useRosterFilter(ALLIES.filter((kind) => owned.includes(kind)));
   const level = levelOf(levels, selected),
     cost = levelUpCost(level);
   const current = unitStats(selected, levels),
@@ -86,6 +90,14 @@ export function UpgradeScreen({
         <div className="upgrade-panel">
           <span className="ribbon">修練中の信者</span>
           <h2>{current.name}</h2>
+          <div className="upgrade-rarity">
+            <span
+              className={`rarity-label rarity-${characterEntry(selected).rarity}`}
+            >
+              {RARITIES[characterEntry(selected).rarity]}
+            </span>
+            <CharacterMaterialNote kind={selected} />
+          </div>
           <div className="upgrade-level">
             Lv.<strong>{level}</strong>
             <span>/ {MAX_LEVEL}</span>
@@ -113,6 +125,10 @@ export function UpgradeScreen({
               </div>
             ))}
           </div>
+          <details className="upgrade-technical">
+            <summary>射程・再出撃・特殊能力などを確認</summary>
+            <CharacterStats kind={selected} stats={current} />
+          </details>
           <p className="upgrade-rule">
             HP・攻撃力は1レベルごとに基礎値の10%上昇。出撃コスト・射程・攻撃間隔は変わりません。
           </p>
@@ -141,8 +157,9 @@ export function UpgradeScreen({
           )}
         </div>
       </div>
+      <RosterTools filter={filter} context="強化" total={owned.length} />
       <nav className="upgrade-roster" aria-label="所持キャラクターを選択">
-        {ALLIES.filter((kind) => owned.includes(kind)).map((kind) => (
+        {filter.visible.map((kind) => (
           <button
             key={kind}
             className={selected === kind ? "selected" : ""}
@@ -158,10 +175,18 @@ export function UpgradeScreen({
               <small>
                 Lv.{levelOf(levels, kind)} / {MAX_LEVEL}
               </small>
+              <small className="owned-rarity">
+                {RARITIES[characterEntry(kind).rarity]}
+              </small>
             </span>
           </button>
         ))}
       </nav>
+      {!filter.visible.length && (
+        <p className="roster-empty" role="status">
+          条件に合う所持キャラはいません。絞り込みを解除して探してください。
+        </p>
+      )}
     </section>
   );
 }

@@ -1,81 +1,82 @@
-import { useState } from "react";
 import { ALLIES, UNITS } from "./data";
 import type { Progress } from "./progressStore";
 import { CharacterImage } from "./CharacterImage";
-import { GACHA_POOL, RARITIES, characterEntry } from "./gacha";
+import { CharacterMaterialNote, CharacterStats } from "./CharacterStats";
+import { RARITIES, characterEntry } from "./gacha";
 import { levelOf, unitStats } from "./progression";
+import { RosterTools, useRosterFilter } from "./RosterTools";
+
 export function CollectionScreen({ progress }: { progress: Progress }) {
-  const [filter, setFilter] = useState(-1);
+  const filter = useRosterFilter(ALLIES);
   return (
     <section className="collection-screen">
       <div className="summon-heading">
         <div>
-          <span className="eyebrow">ARCHIVE / THE STONE FOLLOWERS</span>
-          <h1>信者の図鑑</h1>
+          <span className="eyebrow">ARCHIVE / THE STONE LEGION</span>
+          <h1>岩石軍団の図鑑</h1>
         </div>
         <b>
           {progress.owned.length} / {ALLIES.length} 収集
         </b>
       </div>
-      <nav className="rarity-filters" aria-label="レアリティ絞り込み">
-        {["すべて", ...RARITIES].map((label, i) => (
-          <button
-            className="pause"
-            aria-pressed={filter === i - 1}
-            key={label}
-            onClick={() => setFilter(i - 1)}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
+      <RosterTools filter={filter} context="図鑑" total={ALLIES.length} />
       <div className="collection-grid">
-        {GACHA_POOL.filter((e) => filter < 0 || e.rarity === filter).map(
-          ({ kind, rarity, placeholder }) => {
-            const owned = progress.owned.includes(kind),
-              stats = unitStats(kind, progress.levels);
-            return (
-              <article
-                key={kind}
-                className={`collection-card rarity-${rarity} ${owned ? "" : "unowned"}`}
-              >
-                <span className="rarity-label">{RARITIES[rarity]}</span>
-                <div className={`collection-art ${owned ? "" : "silhouette"}`}>
-                  <CharacterImage kind={kind} hero />
-                  {!owned && <b>？</b>}
-                </div>
-                <h2>{UNITS[kind].name}</h2>
-                <p>{UNITS[kind].role}</p>
-                {owned ? (
-                  <>
-                    <strong>
-                      Lv.{levelOf(progress.levels, kind)} / 重複{" "}
-                      {progress.duplicates[kind] ?? 0}体
-                    </strong>
-                    <p>
-                      HP {stats.hp} / 攻撃 {stats.damage}
-                    </p>
-                    <small>
-                      {progress.origins[kind] === "gacha"
-                        ? "ガチャ入手"
-                        : progress.origins[kind] === "legacy"
-                          ? "旧セーブから引継ぎ"
-                          : "初期の仲間"}
-                    </small>
-                  </>
-                ) : (
-                  <p className="locked-caption">
-                    未所持 / ガチャで入手 · {characterEntry(kind).weight / 100}%
+        {filter.visible.map((kind) => {
+          const owned = progress.owned.includes(kind),
+            rarity = characterEntry(kind).rarity;
+          const stats = unitStats(kind, owned ? progress.levels : {});
+          return (
+            <article
+              key={kind}
+              className={`collection-card rarity-${rarity} ${owned ? "" : "unowned"}`}
+            >
+              <span className="rarity-label">{RARITIES[rarity]}</span>
+              <div className={`collection-art ${owned ? "" : "silhouette"}`}>
+                <CharacterImage kind={kind} hero />
+                {!owned && <b>？</b>}
+              </div>
+              <h2>{UNITS[kind].name}</h2>
+              <p className="collection-role">{UNITS[kind].role}</p>
+              {owned ? (
+                <>
+                  <strong className="collection-level">
+                    Lv.{levelOf(progress.levels, kind)} / 重複{" "}
+                    {progress.duplicates[kind] ?? 0}体
+                  </strong>
+                  <p className="collection-base">
+                    HP {stats.hp.toLocaleString()} / 攻撃{" "}
+                    {stats.damage.toLocaleString()}
                   </p>
-                )}
-                {placeholder && (
-                  <small className="placeholder-label">専用SVGの仮素材</small>
-                )}
-              </article>
-            );
-          },
-        )}
+                  <small className="collection-provenance">
+                    {progress.origins[kind] === "gacha"
+                      ? "ガチャ入手"
+                      : progress.origins[kind] === "legacy"
+                        ? "旧セーブから引継ぎ"
+                        : "初期の仲間"}
+                  </small>
+                </>
+              ) : (
+                <p className="locked-caption">
+                  未所持 / ガチャで入手 ·{" "}
+                  {(characterEntry(kind).weight / 100).toFixed(2)}%
+                </p>
+              )}
+              <CharacterMaterialNote kind={kind} />
+              <details className="character-detail">
+                <summary>
+                  {owned ? "現在の戦闘性能" : "Lv.1の参考性能"}を確認
+                </summary>
+                <CharacterStats kind={kind} stats={stats} />
+              </details>
+            </article>
+          );
+        })}
       </div>
+      {!filter.visible.length && (
+        <p className="roster-empty" role="status">
+          条件に合うキャラはいません。絞り込みを解除して探してください。
+        </p>
+      )}
     </section>
   );
 }

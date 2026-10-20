@@ -217,6 +217,14 @@ test("invalid levels are clamped and unavailable storage does not crash the game
   );
   const data = loadProgress(storage).data;
   assert.equal(data.xp, 0);
-  assert.deepEqual(data.levels, { novice: 20, monk: 1, mage: 6, keito: 1, bellkeeper: 1 });
+  assert.deepEqual(
+    data.levels,
+    Object.fromEntries(
+      ALLIES.map((kind) => [
+        kind,
+        kind === "novice" ? 20 : kind === "mage" ? 6 : 1,
+      ]),
+    ),
+  );
   assert.equal(loadProgress(null).canSave, false);
 });

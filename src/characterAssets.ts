@@ -1,5 +1,5 @@
-import type { Kind } from "./data.ts";
-export type SpriteKind = "novice" | "monk" | "mage" | "keito" | "bellkeeper";
+import type { Kind, AllyKind } from "./data.ts";
+export type SpriteKind = AllyKind;
 export type CharacterAction = "idle" | "walk" | "attack" | "hit" | "death";
 export interface CharacterClip {
   frames: readonly string[];
@@ -15,6 +15,8 @@ export interface CharacterAsset {
   frameCanvas?: { width: number; height: number };
   width: number;
   height: number;
+  motion?: "walk" | "roll" | "hover" | "heavy";
+  attackStyle?: "lunge" | "recoil" | "cast" | "spin" | "slam";
   animation: {
     step: number;
     bob: number;
@@ -23,33 +25,66 @@ export interface CharacterAsset {
     deathSpin: number;
   };
 }
-/** Shared by battle, home, formation and future upgrade/gacha screens. */
+/** Each image remains independent; the rig supplies shared motion, not reused artwork. */
+const rockArt = (
+  kind: Exclude<AllyKind, "keito">,
+  width: number,
+  height: number,
+  motion: CharacterAsset["motion"] = "walk",
+  attackStyle: CharacterAsset["attackStyle"] = "lunge",
+): CharacterAsset => ({
+  image: `./characters/rock-army/${kind}.svg`,
+  quality: "placeholder",
+  width,
+  height,
+  motion,
+  attackStyle,
+  animation: {
+    step: motion === "heavy" ? 5 : motion === "hover" ? 3 : 10,
+    bob: motion === "heavy" ? 1.5 : motion === "hover" ? 4 : 2.4,
+    lean: motion === "heavy" ? 0.035 : 0.055,
+    lunge:
+      attackStyle === "slam"
+        ? 16
+        : attackStyle === "recoil"
+          ? -6
+          : attackStyle === "cast"
+            ? 4
+            : 10,
+    deathSpin: motion === "heavy" ? 0.55 : motion === "hover" ? -1.4 : 1.4,
+  },
+});
+/** Shared by battle, home, formation, upgrades, gacha and the archive. */
 export const CHARACTER_ASSETS: Record<SpriteKind, CharacterAsset> = {
-  novice: {
-    image: "./characters/novice.png",
-    width: 90,
-    height: 118,
-    animation: { step: 12, bob: 2.4, lean: 0.055, lunge: 8, deathSpin: 1.5 },
-  },
-  monk: {
-    image: "./characters/monk.png",
-    width: 125,
-    height: 125,
-    animation: { step: 8, bob: 2, lean: 0.07, lunge: 21, deathSpin: 2 },
-  },
-  mage: {
-    image: "./characters/mage.png",
-    width: 115,
-    height: 145,
-    animation: { step: 5, bob: 3, lean: 0.025, lunge: 5, deathSpin: -1.8 },
-  },
-  bellkeeper: {
-    image: "./characters/bellkeeper.svg",
-    quality: "placeholder",
-    width: 130,
-    height: 145,
-    animation: { step: 6, bob: 2, lean: 0.08, lunge: 12, deathSpin: -2 },
-  },
+  novice: rockArt("novice", 100, 130),
+  monk: rockArt("monk", 138, 140, "heavy", "slam"),
+  mage: rockArt("mage", 125, 146, "hover", "cast"),
+  bellkeeper: rockArt("bellkeeper", 136, 145, "heavy", "slam"),
+  pebble: rockArt("pebble", 84, 105),
+  granite: rockArt("granite", 130, 142, "heavy", "slam"),
+  roller: rockArt("roller", 120, 132, "roll", "spin"),
+  stonethrower: rockArt("stonethrower", 122, 135, "walk", "recoil"),
+  miner: rockArt("miner", 124, 140, "walk", "slam"),
+  fossil: rockArt("fossil", 120, 142, "walk", "cast"),
+  pumice: rockArt("pumice", 120, 124, "hover", "cast"),
+  crystalarcher: rockArt("crystalarcher", 130, 145, "walk", "recoil"),
+  spearman: rockArt("spearman", 132, 145),
+  stoneninja: rockArt("stoneninja", 134, 136, "walk", "spin"),
+  oremonk: rockArt("oremonk", 126, 143, "walk", "cast"),
+  sandstone: rockArt("sandstone", 137, 136, "walk", "recoil"),
+  geode: rockArt("geode", 132, 143, "walk", "cast"),
+  magnet: rockArt("magnet", 130, 142, "heavy", "cast"),
+  lavafist: rockArt("lavafist", 145, 142, "heavy", "slam"),
+  obsidianknight: rockArt("obsidianknight", 136, 147, "heavy", "lunge"),
+  rockcannon: rockArt("rockcannon", 145, 135, "heavy", "recoil"),
+  thundermage: rockArt("thundermage", 135, 148, "hover", "cast"),
+  giantbreaker: rockArt("giantbreaker", 145, 146, "heavy", "slam"),
+  jadedancer: rockArt("jadedancer", 142, 142, "walk", "spin"),
+  titan: rockArt("titan", 160, 150, "heavy", "slam"),
+  meteormage: rockArt("meteormage", 155, 153, "hover", "cast"),
+  rockdragon: rockArt("rockdragon", 173, 145, "heavy", "lunge"),
+  crystalpriest: rockArt("crystalpriest", 145, 154, "hover", "cast"),
+  doomgolem: rockArt("doomgolem", 163, 154, "heavy", "slam"),
   keito: {
     image: "./characters/iwason/portrait.png",
     quality: "draft-background",

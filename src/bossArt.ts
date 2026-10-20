@@ -38,7 +38,7 @@ export function drawBoss(c: CanvasRenderingContext2D, u: Unit, time: number) {
     c.stroke();
   };
   if (boss === "gate") {
-    // A broad door-shaped sentinel, one shield arm and a heavy stone ram.
+    // A human gate captain: exposed face and hands, heavy cuirass and a door shield.
     shape(
       [
         [-29, 0],
@@ -59,56 +59,111 @@ export function drawBoss(c: CanvasRenderingContext2D, u: Unit, time: number) {
     );
     shape(
       [
-        [-42, -25],
-        [-45, -97],
-        [-30, -112],
-        [30, -112],
-        [44, -97],
-        [41, -25],
+        [-37, -22],
+        [-39, -58],
+        [-24, -72],
+        [22, -72],
+        [38, -56],
+        [35, -22],
       ],
       "#8d7c65",
     );
     shape(
       [
-        [-29, -38],
-        [-28, -89],
-        [0, -103],
-        [28, -89],
-        [29, -38],
+        [-26, -27],
+        [-24, -58],
+        [0, -67],
+        [24, -58],
+        [25, -27],
       ],
       "#c1ae88",
     );
+    c.strokeStyle = "#433f37";
+    ellipse(0, -87, 29, 28, "#d9a781");
     shape(
       [
-        [-22, -69],
-        [-22, -85],
-        [0, -98],
-        [22, -85],
-        [22, -69],
+        [-29, -91],
+        [-29, -108],
+        [-16, -119],
+        [13, -119],
+        [30, -106],
+        [30, -89],
+        [20, -97],
+        [-19, -97],
       ],
-      "#3c423d",
+      "#727c72",
     );
-    c.fillStyle = "#ffc869";
-    c.fillRect(-17, -81, 11, 4);
-    c.fillRect(7, -81, 11, 4);
-    c.strokeStyle = "#5e5143";
+    shape(
+      [
+        [-27, -92],
+        [-32, -72],
+        [-22, -67],
+        [-18, -82],
+      ],
+      "#8d9889",
+    );
+    shape(
+      [
+        [27, -92],
+        [31, -73],
+        [21, -67],
+        [18, -82],
+      ],
+      "#8d9889",
+    );
+    c.strokeStyle = "#694b37";
+    c.lineWidth = 3;
     c.beginPath();
-    c.moveTo(-13, -58);
-    c.lineTo(12, -58);
-    c.moveTo(-1, -66);
-    c.lineTo(-1, -41);
+    c.moveTo(-20, -88);
+    c.lineTo(-7, -91);
+    c.moveTo(7, -91);
+    c.lineTo(20, -88);
+    c.stroke();
+    c.fillStyle = "#332e27";
+    c.fillRect(-17, -85, 8, 3);
+    c.fillRect(9, -85, 8, 3);
+    c.strokeStyle = "#9a6447";
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(1, -85);
+    c.lineTo(-4, -74);
+    c.lineTo(3, -73);
+    c.moveTo(-11, -67);
+    c.quadraticCurveTo(0, -62, 11, -67);
     c.stroke();
     shape(
       [
-        [30, -83],
-        [55, -82],
-        [64, -34],
-        [33, -27],
+        [-19, -71],
+        [-12, -58],
+        [0, -53],
+        [15, -61],
+        [20, -72],
+        [8, -67],
+        [0, -68],
+        [-8, -67],
+      ],
+      "#665044",
+    );
+    ellipse(-36, -52, 9, 11, "#d9a781");
+    ellipse(37, -51, 8, 11, "#d9a781");
+    shape(
+      [
+        [31, -79],
+        [55, -77],
+        [64, -30],
+        [33, -24],
       ],
       "#6a7263",
     );
+    c.strokeStyle = "#c6b486";
+    c.beginPath();
+    c.moveTo(45, -71);
+    c.lineTo(49, -32);
+    c.moveTo(36, -49);
+    c.lineTo(57, -50);
+    c.stroke();
     c.save();
-    c.translate(-34, -66);
+    c.translate(-34, -60);
     c.rotate(u.pose ? -0.8 : 0.15);
     shape(
       [
@@ -131,9 +186,9 @@ export function drawBoss(c: CanvasRenderingContext2D, u: Unit, time: number) {
     );
     c.restore();
     c.fillStyle = "#e3c78c";
-    c.font = "bold 17px serif";
+    c.font = "bold 15px serif";
     c.textAlign = "center";
-    c.fillText("門", 0, -29);
+    c.fillText("門", 0, -32);
   } else if (boss === "sun") {
     // Tall solar crown, narrow cloaked body and a long light spear.
     c.strokeStyle = "#edbe60";
@@ -218,53 +273,148 @@ export function drawBoss(c: CanvasRenderingContext2D, u: Unit, time: number) {
       c.globalAlpha = 1;
     }
   } else {
-    // Wide moss-covered sleeping beast, crescent antlers, pillow and dream cloud.
+    // A human sleeping commander: nightcap, huge tired face, cross-legged robe and pillow.
     c.strokeStyle = "#3b5360";
-    ellipse(0, -40, 49, 35, "#728f82");
-    ellipse(-31, -9, 20, 9, "#526f66");
-    ellipse(31, -9, 20, 9, "#526f66");
     shape(
       [
-        [-35, -63],
-        [-48, -101],
-        [-32, -91],
-        [-27, -112],
-        [-18, -76],
+        [-38, -6],
+        [-36, -39],
+        [-24, -58],
+        [22, -60],
+        [39, -38],
+        [43, -6],
       ],
-      "#b0c2ab",
+      "#627f80",
     );
     shape(
       [
-        [35, -63],
-        [48, -101],
-        [32, -91],
-        [27, -112],
-        [18, -76],
+        [-14, -54],
+        [-19, -15],
+        [21, -15],
+        [12, -55],
       ],
-      "#b0c2ab",
+      "#c2cabb",
     );
-    ellipse(0, -69, 33, 28, "#9bbab3");
-    c.strokeStyle = "#3c5860";
+    shape(
+      [
+        [-33, -15],
+        [-50, -7],
+        [-47, 0],
+        [-10, -1],
+        [3, -11],
+      ],
+      "#4c6870",
+    );
+    shape(
+      [
+        [31, -15],
+        [48, -6],
+        [43, 1],
+        [7, -1],
+        [-3, -10],
+      ],
+      "#5b737b",
+    );
+    ellipse(0, -81, 34, 31, "#d6b397");
+    // Grey hair and cloth nightcap replace the former antlers and animal ears.
+    shape(
+      [
+        [-32, -88],
+        [-38, -100],
+        [-25, -114],
+        [4, -120],
+        [26, -113],
+        [44, -111],
+        [51, -103],
+        [43, -99],
+        [20, -102],
+        [-4, -105],
+        [-23, -99],
+      ],
+      "#8da3b3",
+    );
+    ellipse(49, -101, 6, 6, "#e5e7d7");
+    shape(
+      [
+        [-31, -94],
+        [-37, -76],
+        [-29, -62],
+        [-24, -73],
+        [-23, -89],
+      ],
+      "#d9d9cb",
+    );
+    shape(
+      [
+        [30, -92],
+        [36, -76],
+        [28, -64],
+        [23, -74],
+        [23, -88],
+      ],
+      "#d9d9cb",
+    );
+    c.strokeStyle = "#775d50";
     c.lineWidth = 3;
     c.beginPath();
-    c.moveTo(-22, -70);
-    c.quadraticCurveTo(-14, -65, -6, -70);
-    c.moveTo(7, -70);
-    c.quadraticCurveTo(15, -65, 23, -70);
+    c.moveTo(-22, -83);
+    c.quadraticCurveTo(-14, -77, -6, -82);
+    c.moveTo(7, -82);
+    c.quadraticCurveTo(15, -77, 23, -82);
     c.stroke();
-    ellipse(0, -55, 10, 7, "#547580");
-    ellipse(-2, -29, 29, 13, "#c8d1bd");
-    c.fillStyle = "#ccdfa9";
-    for (let i = 0; i < 5; i++) {
-      c.beginPath();
-      c.arc(-35 + i * 17, -42 + (i % 2) * 6, 5, Math.PI, 0);
-      c.fill();
-    }
+    c.strokeStyle = "#aa7c61";
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(1, -81);
+    c.lineTo(-4, -69);
+    c.quadraticCurveTo(2, -64, 8, -70);
+    c.stroke();
+    shape(
+      [
+        [-21, -69],
+        [-16, -55],
+        [0, -44],
+        [18, -55],
+        [23, -69],
+        [8, -64],
+        [0, -66],
+        [-8, -64],
+      ],
+      "#d8d7c7",
+    );
+    c.fillStyle = "#78604f";
+    c.beginPath();
+    c.ellipse(0, -61, 4, 5, 0, 0, Math.PI * 2);
+    c.fill();
+    c.save();
+    c.translate(-42, -45);
+    c.rotate(u.pose ? -0.2 : 0.08);
+    c.strokeStyle = "#59667a";
+    c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(0, 41);
+    c.lineTo(0, -45);
+    c.stroke();
+    c.strokeStyle = "#d9e0c2";
+    c.lineWidth = 6;
+    c.beginPath();
+    c.arc(0, -48, 10, 0.5, Math.PI * 1.75);
+    c.stroke();
+    c.restore();
+    ellipse(-30, -29, 10, 7, "#d6b397");
+    ellipse(28, -29, 10, 7, "#d6b397");
+    ellipse(-2, -21, 30, 12, "#d9dccb");
+    c.strokeStyle = "#a1b6b2";
+    c.lineWidth = 1.5;
+    c.beginPath();
+    c.moveTo(-22, -24);
+    c.quadraticCurveTo(-3, -17, 20, -24);
+    c.stroke();
     c.fillStyle = "#c7e1ec";
     c.font = "bold 12px serif";
-    c.fillText("Z", 33, -95 - Math.sin(time * 2) * 3);
+    c.fillText("Z", 35, -110 - Math.sin(time * 2) * 3);
     c.font = "bold 8px serif";
-    c.fillText("z", 45, -107 - Math.sin(time * 2) * 3);
+    c.fillText("z", 47, -119 - Math.sin(time * 2) * 3);
     if (u.pose) {
       c.strokeStyle = "#c1dfee";
       c.lineWidth = 3;
@@ -275,6 +425,7 @@ export function drawBoss(c: CanvasRenderingContext2D, u: Unit, time: number) {
       }
     }
   }
+
   if (u.hp > 0) {
     c.fillStyle = "#283b33";
     c.fillRect(-28, -134, 56, 4);

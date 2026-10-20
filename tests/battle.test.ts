@@ -1,25 +1,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Battle } from "../src/engine.ts";
-import { ALLIES, STAGE } from "../src/data.ts";
+import { ALLIES, LEGACY_ALLIES, STAGE } from "../src/data.ts";
 const advance = (b: Battle, seconds: number) => {
   for (let i = 0; i < seconds * 60; i++) b.update(1 / 60);
 };
 test("deployment requires active play, funds and cooldown; all owned allies work", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
-  assert.equal(b.deploy("novice"), false);
-  b.toggle();
+  const paused = new Battle(["novice"], {}, ALLIES);
+  assert.equal(paused.deploy("novice"), false);
   for (const kind of ALLIES) {
+    // A lineup has ten slots; test each owned unit without truncating a 30-unit catalog.
+    const b = new Battle([kind], {}, ALLIES);
+    b.toggle();
     b.money = 1800;
-    assert.equal(b.deploy(kind), true);
-    assert.equal(b.deploy(kind), false);
+    assert.equal(b.deploy(kind), true, kind);
+    assert.equal(b.deploy(kind), false, kind);
   }
-  b.money = 0;
-  assert.equal(b.deploy("mage"), false);
-  assert.equal(b.deploy("heavy"), false);
+  const poor = new Battle(["mage"], {}, ALLIES);
+  poor.toggle();
+  poor.money = 0;
+  assert.equal(poor.deploy("mage"), false);
+  assert.equal(poor.deploy("heavy"), false);
 });
 test("pause freezes time, income, cooldown and combat; fresh battle resets", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
+  const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
   b.toggle();
   b.deploy("novice");
   b.toggle();
@@ -29,13 +33,13 @@ test("pause freezes time, income, cooldown and combat; fresh battle resets", () 
   b.toggle();
   advance(b, 1);
   assert.ok(b.time > 0.9);
-  const fresh = new Battle(ALLIES, {}, ALLIES);
+  const fresh = new Battle(LEGACY_ALLIES, {}, ALLIES);
   assert.equal(fresh.time, 0);
   assert.equal(fresh.units.length, 0);
   assert.equal(fresh.leftHP, STAGE.baseHP);
 });
 test("all five enemies appear and an undefended base loses", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
+  const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
   b.toggle();
   advance(b, 35);
   assert.deepEqual(
@@ -47,7 +51,7 @@ test("all five enemies appear and an undefended base loses", () => {
   assert.equal(b.leftHP, 0);
 });
 test("a mixed army can win the complete stage", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
+  const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
   b.toggle();
   const used = new Set<string>();
   for (let i = 0; i < 60 * 300 && b.status === "playing"; i++) {
@@ -67,7 +71,7 @@ test("a mixed army can win the complete stage", () => {
 });
 test("area attacks hit multiple targets while single attacks hit one", () => {
   for (const kind of ["monk", "novice"] as const) {
-    const b = new Battle(ALLIES, {}, ALLIES);
+    const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
     b.toggle();
     const a = b.spawn(kind, 1);
     a.x = 500;
@@ -90,7 +94,7 @@ test("single-role spam and unsupported attackers cannot clear the stage", () => 
     ["monk"],
     ["mage", "keito"],
   ] as const) {
-    const b = new Battle(ALLIES, {}, ALLIES);
+    const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
     b.toggle();
     for (let i = 0; i < 60 * 360 && b.status === "playing"; i++) {
       for (const k of choices) b.deploy(k);
@@ -100,7 +104,7 @@ test("single-role spam and unsupported attackers cannot clear the stage", () => 
   }
 });
 test("hits trigger bounded effects and a brief combat stop without blocking deployment", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
+  const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
   b.toggle();
   const a = b.spawn("keito", 1);
   a.x = 500;
@@ -128,7 +132,7 @@ test("hits trigger bounded effects and a brief combat stop without blocking depl
   assert.equal(JSON.stringify(b), paused);
 });
 test("ranged enemy stops behind the frontline and bomber splash is localized", () => {
-  const b = new Battle(ALLIES, {}, ALLIES);
+  const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
   b.toggle();
   const sniper = b.spawn("sniper", -1);
   sniper.x = 600;
@@ -139,7 +143,7 @@ test("ranged enemy stops behind the frontline and bomber splash is localized", (
   b.update(0.01);
   assert.equal(sniper.x, x);
   assert.ok(wall.hp < 330);
-  const c = new Battle(ALLIES, {}, ALLIES);
+  const c = new Battle(LEGACY_ALLIES, {}, ALLIES);
   c.toggle();
   const bomber = c.spawn("bomber", -1);
   bomber.x = 600;
@@ -157,7 +161,7 @@ test("ranged enemy stops behind the frontline and bomber splash is localized", (
 
 test("deployment timing changes the outcome for the same wall and attacker composition", () => {
   for (const delay of [0, 60]) {
-    const b = new Battle(ALLIES, {}, ALLIES);
+    const b = new Battle(LEGACY_ALLIES, {}, ALLIES);
     b.toggle();
     for (let i = 0; i < 60 * 360 && b.status === "playing"; i++) {
       if (b.time >= delay)

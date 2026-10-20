@@ -8,7 +8,8 @@ import { initialFormation, assignOwnedSlot, type Formation } from "./formation";
 import "./style.css";
 import { useProgress } from "./useProgress";
 import { awardStageVictory, upgradeCharacter } from "./progressStore";
-import { unitStats, levelOf, type Levels } from "./progression";
+import type { Levels } from "./progression";
+import { FormationPicker } from "./FormationPicker";
 import { UpgradeScreen } from "./UpgradeScreen";
 import { GachaScreen } from "./GachaScreen";
 import { CollectionScreen } from "./CollectionScreen";
@@ -325,48 +326,7 @@ function App() {
               </button>
             ))}
           </section>
-          <section className="character-picker">
-            <div className="deploy-title">
-              <h2>枠{selected + 1}に配置する信者</h2>
-              <button className="pause" onClick={() => choose(null)}>
-                この枠を外す
-              </button>
-            </div>
-            <div className="roster-grid">
-              {progress.owned.map((kind) => {
-                const d = unitStats(kind, progress.levels);
-                const pos = formation.indexOf(kind);
-                return (
-                  <button
-                    key={kind}
-                    onClick={() => choose(kind)}
-                    aria-label={`${d.name}を枠${selected + 1}に配置`}
-                  >
-                    <CharacterImage kind={kind} />
-                    <div>
-                      <h3>
-                        {d.name}{" "}
-                        <small>Lv.{levelOf(progress.levels, kind)}</small>
-                      </h3>
-                      <span>
-                        {d.role} / ¥ {d.cost}
-                      </span>
-                      <small>
-                        HP {d.hp} / 攻撃 {d.damage}
-                        <br />
-                        射程 {d.range} / 攻撃間隔 {d.interval}秒
-                      </small>
-                      <b>
-                        {pos >= 0
-                          ? `枠${pos + 1}に編成中 → 移動`
-                          : "この枠に配置"}
-                      </b>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+          <FormationPicker owned={progress.owned} formation={formation} levels={progress.levels} selected={selected} onChoose={choose} />
           <div className="formation-actions">
             <span role="status">
               {notice || "変更はすぐに現在の編成へ反映されます。"}

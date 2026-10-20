@@ -1,0 +1,51 @@
+import type { Stats, Ability } from "./data.ts";
+
+/** HP, damage, attack interval, range, speed, cost, cooldown, HP knockback segments. */
+type Combat = readonly [number, number, number, number, number, number, number, number?];
+function ally<const Id extends string>(id: Id, rarity: number, material: string, name: string, role: string, combat: Combat, color: string,
+  options: {area?: boolean; size?: number; splash?: number; ability?: Ability; symbol?: string} = {}) {
+  const [hp, damage, interval, range, speed, cost, cooldown, knockback = 1] = combat;
+  const stats: Stats = {name,role,hp,damage,interval,range,speed,cost,cooldown,knockback,color,
+    area: options.area ?? false, size: options.size ?? 1, symbol: options.symbol ?? name.slice(0,1),
+    ...(options.splash !== undefined ? {splash: options.splash} : {}),
+    ...(options.ability ? {ability: options.ability} : {})};
+  return {id,rarity,material,stats};
+}
+/** One catalog drives ownership, growth, gacha, roster and the battle stat table. */
+export const ALLY_ROSTER = [
+  // Normal: cheap roles stay useful even when expensive characters are owned.
+  ally("novice",0,"白花崗岩の石像","見習い信者","量産・壁役",[330,10,1.1,38,35,65,3],"#9db6a1",{symbol:"祈"}),
+  ally("pebble",0,"小石","小石信者","低コスト・量産壁",[190,6,1.2,30,38,40,2.4],"#b4ab91"),
+  ally("granite",0,"花崗岩","岩盾兵","防御・低速壁",[620,8,2.2,32,16,125,6.5],"#879996"),
+  ally("roller",0,"縞岩の車輪","転がる岩玉","高速突撃・単体",[170,65,1.7,35,78,130,7,2],"#b1a58b",{size:.9}),
+  ally("stonethrower",0,"川石","石投げ信者","低コスト・遠距離",[100,35,1.8,145,25,95,5,3],"#9ea789"),
+  ally("miner",0,"鉄鉱石","岩の採掘兵","近接・単体火力",[290,75,1.5,42,29,140,6,2],"#b08f69"),
+  ally("fossil",0,"化石岩","化石の番人","鈍足付与・前衛",[310,12,2.6,48,22,120,8],"#c5b890",{ability:{type:"slow",value:.7,duration:1.2}}),
+  ally("pumice",0,"軽石","軽石の運び手","高速補充・壁役",[180,8,1.3,30,62,85,3.8,2],"#bec2b4",{size:.85}),
+  // Rare: specialized range, control and healing trade offense for utility.
+  ally("monk",1,"花崗岩の拳","岩の拳僧","近距離・範囲",[420,65,1.6,55,27,180,5],"#d29c65",{area:true,size:1.14,symbol:"拳"}),
+  ally("crystalarcher",1,"水晶","水晶射手","長射程・単体",[120,85,2.3,245,24,230,10,3],"#8cd5dd"),
+  ally("spearman",1,"玄武岩","岩槍兵","中距離・範囲",[300,52,1.8,110,30,175,7,2],"#7fa3ac",{area:true,splash:42}),
+  ally("stoneninja",1,"砂岩・雲母","石ころ忍者","高速・単体火力",[180,43,.7,42,90,185,9,3],"#b9a37d"),
+  ally("oremonk",1,"銅鉱石","鉱石僧侶","回復支援・近衛",[250,12,3.6,50,22,230,14,2],"#72ae91",{ability:{type:"heal",value:28,range:150}}),
+  ally("sandstone",1,"砂岩","砂岩の狙撃手","遠距離・単体高火力",[105,220,4.4,285,20,330,16,3],"#c5a36e"),
+  ally("geode",1,"晶洞石","晶洞の薬師","回復支援・後衛",[145,9,4.5,135,18,290,19,3],"#b6a0ce",{ability:{type:"heal",value:45,range:190}}),
+  ally("magnet",1,"磁鉄鉱","磁鉄の衛士","ふっとばし・防御",[480,20,2.8,65,21,250,12],"#7b8796",{ability:{type:"push",value:22}}),
+  // Super rare: higher damage is paired with cost, recovery time or vulnerability.
+  ally("mage",2,"紫水晶の石像","ドラクエ信者","遠距離・単体",[140,130,1.8,185,25,240,8],"#a59bc6",{symbol:"杖"}),
+  ally("lavafist",2,"溶岩","溶岩拳僧","近距離・広範囲",[400,120,2.6,60,26,360,12,2],"#e7814c",{area:true,splash:90,size:1.15}),
+  ally("obsidianknight",2,"黒曜石","黒曜石騎士","耐性・重装前衛",[780,62,2.3,45,16,350,15],"#69718e",{ability:{type:"armor",value:.8},size:1.1}),
+  ally("rockcannon",2,"石灰岩の砲台","岩石砲台","超長射程・単体",[150,260,5.5,335,12,470,23,3],"#a19d8e",{size:1.2}),
+  ally("thundermage",2,"雷水晶","雷晶の術師","範囲攻撃・短時間停止",[155,60,4,210,22,390,19,3],"#ceb6ec",{area:true,splash:60,ability:{type:"stun",value:0,duration:.45}}),
+  ally("giantbreaker",2,"赤鉄鉱","巨石破砕兵","対ボス・単体火力",[470,135,2.9,55,23,400,17,2],"#b78972",{size:1.18,ability:{type:"bossSlayer",value:1.7}}),
+  ally("jadedancer",2,"翡翠","翡翠の舞い手","範囲攻撃・鈍足",[210,42,1.5,95,47,310,13,3],"#76c4a3",{area:true,splash:50,ability:{type:"slow",value:.65,duration:1.1}}),
+  // Ultra rare: six distinct jobs, with long redeployment preventing blanket upgrades.
+  ally("bellkeeper",3,"青銅鉱と石面","鐘守りの巡礼","鐘の盾・範囲",[780,85,2.6,65,18,380,14],"#61cbbb",{area:true,size:1.25,symbol:"鐘"}),
+  ally("titan",3,"巨岩","巨岩の守護者","超高耐久・低火力",[1950,35,3.2,45,10,620,34],"#879793",{size:1.6}),
+  ally("meteormage",3,"隕石","隕石魔導師","遠距離・広範囲",[180,230,5.8,275,16,690,32,3],"#a791b9",{area:true,splash:145,size:1.1}),
+  ally("rockdragon",3,"玄武岩の龍","岩龍","大型・範囲アタッカー",[920,200,3.7,135,20,800,36,2],"#8bada0",{area:true,splash:95,size:1.6}),
+  ally("crystalpriest",3,"透明水晶","水晶の大司祭","広域回復・低火力",[330,20,5,170,17,630,35,3],"#a6dfe3",{size:1.15,ability:{type:"heal",value:85,range:220}}),
+  ally("doomgolem",3,"亀裂の巨岩","破滅の岩巨人","超高火力・鈍重",[830,600,7.5,60,9,1000,48],"#ac7b68",{area:true,splash:70,size:1.65}),
+  // Keito's numbers, exclusive art and fixed one-ticket chance are preserved.
+  ally("keito",4,"岩の鎧と神光","岩尊けいと","大型・範囲",[650,260,3.2,85,19,750,24],"#e8c36a",{area:true,size:1.65,symbol:"岩"}),
+] as const;

@@ -1,16 +1,36 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { ALLIES } from "../src/data.ts";
 import {
   CHARACTER_ASSETS,
   containSize,
   characterAction,
   characterFrame,
+  hasCharacterAsset,
 } from "../src/characterAssets.ts";
 test("each ally has an independent full-body image asset path", () => {
   const entries = Object.values(CHARACTER_ASSETS);
-  assert.equal(entries.length, 5);
-  assert.equal(new Set(entries.map((v) => v.image)).size, 5);
+  assert.equal(entries.length, 30);
+  assert.equal(new Set(entries.map((v) => v.image)).size, 30);
   for (const entry of entries) assert.match(entry.image, /\.(png|webp|svg)$/);
+});
+test("rock army drafts are marked as placeholders and Keito keeps the supplied clip set", () => {
+  for (const kind of ALLIES) {
+    assert.ok(hasCharacterAsset(kind), kind);
+    const asset = CHARACTER_ASSETS[kind];
+    assert.ok(asset, kind);
+    if (kind === "keito") {
+      assert.equal(asset.image, "./characters/iwason/portrait.png");
+      assert.equal(asset.quality, "draft-background");
+      assert.deepEqual(
+        Object.values(asset.clips!).map((clip) => clip.frames.length),
+        [4, 4, 3, 2, 1],
+      );
+    } else {
+      assert.equal(asset.quality, "placeholder", kind);
+      assert.match(asset.image, /\.svg$/);
+    }
+  }
 });
 test("contain sizing preserves complete tall and wide images without distortion", () => {
   for (const [width, height] of [
@@ -25,7 +45,7 @@ test("contain sizing preserves complete tall and wide images without distortion"
   assert.deepEqual(containSize(0, 100, 80, 90), { width: 0, height: 0 });
 });
 
-test("all configured PNG assets are included in the checkout", async () => {
+test("all configured image assets exist and have positive source dimensions", async () => {
   const { readFile } = await import("node:fs/promises");
   const sources = new Set(
     Object.values(CHARACTER_ASSETS).flatMap((asset) => [
@@ -37,7 +57,23 @@ test("all configured PNG assets are included in the checkout", async () => {
     const bytes = await readFile(
       new URL("../public/" + source.replace(/^\.\//, ""), import.meta.url),
     );
-    if (source.endsWith(".svg")) { assert.match(bytes.toString(), /viewBox="0 0 360 420"/); continue; }
+    if (source.endsWith(".svg")) {
+      const svg = bytes.toString();
+      assert.match(svg, /<svg\b/);
+      const dimensions = svg
+        .match(/viewBox=["']([^"']+)["']/)?.[1]
+        .trim()
+        .split(/[\s,]+/)
+        .map(Number);
+      assert.ok(
+        dimensions &&
+          dimensions.length === 4 &&
+          dimensions.every(Number.isFinite),
+        source,
+      );
+      assert.ok(dimensions[2] > 0 && dimensions[3] > 0, source);
+      continue;
+    }
     assert.equal(bytes.subarray(1, 4).toString(), "PNG");
     assert.ok(bytes.readUInt32BE(16) > 0 && bytes.readUInt32BE(20) > 0);
     assert.equal(bytes[25], 6, "RGBA PNG includes an alpha channel");

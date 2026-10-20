@@ -8,6 +8,7 @@ import {
   finishGacha,
   durableChange,
   secureTicket,
+  RARITIES,
 } from "../src/gacha.ts";
 import {
   newProgress,
@@ -58,9 +59,19 @@ test("all 10,000 tickets match exact weights: Keito 0.01%, total 100%, five rari
     0.01,
   );
   assert.deepEqual(
-    [...new Set(GACHA_POOL.map((e) => e.rarity))],
+    [...new Set(GACHA_POOL.map((e) => e.rarity))].sort(),
     [0, 1, 2, 3, 4],
   );
+  assert.deepEqual(
+    [0, 1, 2, 3, 4].map((rarity) =>
+      GACHA_POOL.filter((e) => e.rarity === rarity).reduce(
+        (sum, e) => sum + e.weight,
+        0,
+      ),
+    ),
+    [6000, 3400, 500, 99, 1],
+  );
+  assert.equal(RARITIES[4], "伝説レア");
   for (const invalid of [-1, 10000, 1.5, NaN])
     assert.throws(() => drawCharacter(invalid));
 });

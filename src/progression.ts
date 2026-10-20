@@ -26,5 +26,7 @@ export function unitStats(kind: Kind, levels: Levels = {}): Stats {
     ...base,
     hp: Math.round((base.hp * growth) / 100),
     damage: Math.round((base.damage * growth) / 100),
+    ...(base.ability ? {ability: {...base.ability, value: base.ability.type === "heal"
+      ? Math.round(base.ability.value * growth / 100) : base.ability.value}} : {}),
   };
 }

@@ -1,7 +1,7 @@
 import { Battle, type Unit } from "./engine.ts";
 import { UNITS } from "./data.ts";
 import { drawAlly, isAlly } from "./characterArt.ts";
-import { hasCharacterAsset } from "./characterAssets.ts";
+import { hasCharacterAsset, CHARACTER_ASSETS } from "./characterAssets.ts";
 import { drawBoss } from "./bossArt.ts";
 import { drawStageScenery } from "./stageScenery.ts";
 import { drawCharacterSprite } from "./characterSprites.ts";
@@ -20,10 +20,9 @@ export function figure(
   c.save();
   c.translate(u.x + u.recoil, y);
   c.scale(d.size * displayScale, d.size * displayScale);
-  if (d.boss) {
-    drawBoss(c, u, t);
-    c.restore();
-    return;
+  if ((u.healFlash ?? 0) > 0 && u.hp > 0) {
+    c.save(); c.globalAlpha *= Math.min(1, u.healFlash! * 2);
+    c.strokeStyle = "#a8f0bd"; c.lineWidth = 3; c.beginPath(); c.ellipse(0,-8,36,12,0,0,Math.PI*2); c.stroke(); c.restore();
   }
   if ((u.stun ?? 0) > 0 && u.hp > 0) {
     c.fillStyle = "#b9ecff";
@@ -31,6 +30,10 @@ export function figure(
     c.textAlign = "center";
     c.fillText("Zz", 0, -160);
   }
+  if ((u.slow ?? 0) > 0 && u.hp > 0) {
+    c.fillStyle = "#a6e3ed"; c.font = "bold 18px sans-serif"; c.textAlign = "center"; c.fillText("↓", 0, d.boss ? -140 : -112);
+  }
+  if (d.boss) { drawBoss(c, u, t); c.restore(); return; }
   if (hasCharacterAsset(u.kind)) {
     // The old procedural rig is used only after an image has failed to load.
     if (
@@ -38,11 +41,11 @@ export function figure(
     )
       if (isAlly(u.kind)) drawAlly(c, u, t, walking);
       else {
-        c.fillStyle = d.color;
-        c.fillText("鐘", -12, -50);
+        c.fillStyle = d.color; c.beginPath(); c.moveTo(-23,-20);c.lineTo(-30,-70);c.lineTo(0,-100);c.lineTo(30,-70);c.lineTo(23,-20);c.closePath();c.fill();
+        c.fillStyle = "#263d36"; c.font = "bold 22px serif"; c.fillText(d.symbol, -12, -50);
       }
     if (showHealth && u.hp > 0) {
-      const top = u.kind === "mage" ? -146 : u.kind === "keito" ? -145 : -120;
+      const top = -CHARACTER_ASSETS[u.kind].height - 5;
       c.fillStyle = "#283b33";
       c.fillRect(-22, top, 44, 4);
       c.fillStyle = "#9ed7bc";
@@ -263,14 +266,13 @@ export function draw(
       sample.lastMove = b.time;
       sample.x = u.x;
     }
+    const extent = hasCharacterAsset(u.kind) ? CHARACTER_ASSETS[u.kind].height : UNITS[u.kind].boss ? 145 : 0;
     figure(
       c,
       u,
       b.time,
       295,
-      UNITS[u.kind].boss
-        ? Math.min(1.4, (height - 70) / (145 * UNITS[u.kind].size))
-        : 1.4,
+      extent ? Math.min(1.4, (height - 110) / (extent * UNITS[u.kind].size)) : 1.4,
       true,
       b.time - sample.lastMove < 0.12 && !u.pose,
     );

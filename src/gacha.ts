@@ -1,4 +1,5 @@
 import { type Kind } from "./data.ts";
+import { ALLY_ROSTER } from "./allyRoster.ts";
 import type { Progress, SaveStorage } from "./progressStore.ts";
 
 export const RARITIES = [
@@ -6,7 +7,7 @@ export const RARITIES = [
   "レア",
   "激レア",
   "超激レア",
-  "伝説",
+  "伝説レア",
 ] as const;
 export const GACHA_COST = 150;
 export const TOTAL_WEIGHT = 10_000;
@@ -16,13 +17,16 @@ export const GACHA_POOL: readonly {
   rarity: number;
   weight: number;
   placeholder?: boolean;
-}[] = [
-  { kind: "novice", rarity: 0, weight: 6000 },
-  { kind: "monk", rarity: 1, weight: 3000 },
-  { kind: "mage", rarity: 2, weight: 900 },
-  { kind: "bellkeeper", rarity: 3, weight: 99, placeholder: true },
-  { kind: "keito", rarity: 4, weight: 1 },
-];
+}[] = ALLY_ROSTER.map((entry) => {
+  if (entry.id === "keito") return {kind: entry.id, rarity: 4, weight: 1};
+  if (entry.rarity === 4) throw new Error("The legendary slot is reserved for Keito");
+  const peers = ALLY_ROSTER.filter(candidate => candidate.rarity === entry.rarity);
+  const budgets = [6000, 3400, 500, 99, 1];
+  const budget = budgets[entry.rarity], index = peers.findIndex(peer => peer.id === entry.id);
+  return {kind: entry.id, rarity: entry.rarity,
+    weight: Math.floor(budget / peers.length) + (index < budget % peers.length ? 1 : 0),
+    placeholder: true};
+});
 export const characterEntry = (kind: Kind) =>
   GACHA_POOL.find((entry) => entry.kind === kind)!;
 export type GachaTheme =

@@ -19,7 +19,7 @@ import {
   stageById,
   type Campaign,
 } from "./stages.ts";
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 const LEGACY_KEYS = [
   "jitto-save",
   "jittoWarSave",
@@ -121,9 +121,9 @@ export function migrateProgress(input: unknown): Progress {
       : legacy
         ? LEGACY_ALLIES
         : INITIAL_ALLIES;
-  const owned = ALLIES.filter(
-    (kind) => INITIAL_ALLIES.includes(kind) || candidates.includes(kind),
-  );
+  const owned: Kind[] = [...new Set([...candidates.filter(
+    (kind): kind is Kind => typeof kind === "string" && ALLIES.includes(kind as Kind),
+  ), ...INITIAL_ALLIES])];
   const origins: Progress["origins"] = {};
   const duplicates: Progress["duplicates"] = {};
   for (const kind of owned) {

@@ -16,6 +16,10 @@ export interface Unit {
   dead: number;
   recoil: number;
   stun?: number;
+  slow?: number;
+  slowFactor?: number;
+  knockbacks?: number;
+  healFlash?: number;
 }
 export interface Effect {
   x: number;
@@ -170,12 +174,30 @@ export class Battle {
         u.dead += dt;
         continue;
       }
+      if ((u.healFlash ?? 0) > 0) u.healFlash = Math.max(0, u.healFlash! - dt);
+      if ((u.slow ?? 0) > 0) {
+        u.slow = Math.max(0, u.slow! - combatDt);
+        if (!u.slow) u.slowFactor = 1;
+      }
       if ((u.stun ?? 0) > 0) {
         u.stun = Math.max(0, (u.stun ?? 0) - combatDt);
         continue;
       }
       const d = this.stats[u.kind];
       u.attack -= combatDt;
+      if (d.ability?.type === "heal" && u.attack <= 0 && combatDt > 0) {
+        const recipients = this.units.filter(v => v !== u && v.hp > 0 && v.hp < v.maxHP && v.side === u.side && Math.abs(v.x - u.x) <= (d.ability!.range ?? 150))
+          .sort((a,b) => a.hp / a.maxHP - b.hp / b.maxHP).slice(0,3);
+        if (recipients.length) {
+          u.attack = d.interval; u.pose = .3;
+          for (const v of recipients) {
+            const healed = Math.min(v.maxHP - v.hp, d.ability.value);
+            v.hp += healed; v.healFlash = .5;
+            this.effects.push({x: v.x, y: 230, text: `+${healed}`, life: .8, color: "#9fe9b4"});
+          }
+          continue;
+        }
+      }
       const targets = this.units
         .filter(
           (v) => v.hp > 0 && v.side !== u.side && (v.x - u.x) * u.side >= -15,
@@ -187,7 +209,7 @@ export class Battle {
         ? Math.abs(target.x - u.x)
         : Math.abs(baseX - u.x);
       if (distance > d.range) {
-        u.x += u.side * d.speed * combatDt;
+        u.x += u.side * d.speed * (u.slowFactor ?? 1) * combatDt;
         continue;
       }
       if (u.attack > 0 || combatDt === 0) continue;
@@ -202,12 +224,31 @@ export class Battle {
               )
             : [target];
         for (const v of hits) {
-          v.hp -= d.damage;
+          const victim = this.stats[v.kind];
+          const multiplier = d.ability?.type === "bossSlayer" && victim.boss ? d.ability.value : 1;
+          const resistance = victim.ability?.type === "armor" ? victim.ability.value : 1;
+          const damage = Math.max(1, Math.round(d.damage * multiplier * resistance));
+          v.hp -= damage;
           v.flash = 0.18;
           v.recoil = -v.side * (u.kind === "keito" ? 22 : 8);
           if (d.push)
             v.x = Math.max(105, Math.min(1295, v.x + u.side * d.push));
           if (d.stun && v.hp > 0) v.stun = Math.max(v.stun ?? 0, d.stun);
+          if (v.hp > 0) {
+            const ability = d.ability, bossResistance = victim.boss ? .5 : 1;
+            if (ability?.type === "slow") {
+              v.slowFactor = (v.slow ?? 0) > 0 ? Math.min(v.slowFactor ?? 1, ability.value) : ability.value;
+              v.slow = Math.max(v.slow ?? 0, (ability.duration ?? 1) * bossResistance);
+            }
+            if (ability?.type === "stun") v.stun = Math.max(v.stun ?? 0, (ability.duration ?? .4) * bossResistance);
+            if (ability?.type === "push") v.x = Math.max(105, Math.min(1295, v.x + u.side * ability.value * bossResistance));
+            const crossed = Math.min(victim.knockback - 1, Math.floor((1 - v.hp / v.maxHP) * victim.knockback));
+            if (crossed > (v.knockbacks ?? 0)) {
+              v.knockbacks = crossed;
+              v.x = Math.max(105, Math.min(1295, v.x - v.side * 28));
+              v.attack = Math.max(v.attack, .3);
+            }
+          }
           this.impact(
             v.x,
             260,
@@ -218,7 +259,7 @@ export class Battle {
           this.effects.push({
             x: v.x,
             y: 240 - UNITS[v.kind].size * 35,
-            text: String(d.damage),
+            text: String(damage),
             life: 0.8,
             color: u.side === 1 ? "#ffe2a0" : "#ffa79a",
           });

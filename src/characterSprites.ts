@@ -55,6 +55,8 @@ export function drawCharacterSprite(
   const strike = u.pose > 0 ? Math.sqrt(Math.min(1, u.pose / 0.3)) : 0;
   const step = walking ? Math.sin(time * a.step + u.id) : 0;
   const breath = Math.sin(time * 2.2 + u.id);
+  const hover = definition.motion === "hover";
+  const rolling = definition.motion === "roll";
   c.save();
   // Keep standing sprites inside the battlefield edges without altering combat positions.
   if (keepInStage && u.hp > 0) {
@@ -68,16 +70,22 @@ export function drawCharacterSprite(
     c.translate(-u.side * 75 * p, -Math.sin(p * Math.PI) * 55);
     c.rotate(p * Math.PI * (isFrame ? 0.12 : a.deathSpin) * u.side);
   } else {
+    const cast = definition.attackStyle === "cast";
+    const slam = definition.attackStyle === "slam";
     c.translate(
       u.side * strike * a.lunge * (isFrame ? 0.2 : 1),
-      -Math.abs(step) * a.bob + breath * 0.65,
+      hover
+        ? -5 + breath * a.bob - strike * 3
+        : -Math.abs(step) * a.bob + breath * 0.65 - (slam ? strike * 4 : 0),
     );
     c.rotate(
-      step * a.lean +
-        u.side * strike * (u.kind === "monk" ? 0.12 : -0.04) +
+      (rolling ? step * 0.35 : step * a.lean) +
+        u.side *
+          strike *
+          (slam ? 0.14 : definition.attackStyle === "spin" ? 0.2 : -0.04) +
         (u.flash ? Math.sin(time * 90) * 0.08 : 0),
     );
-    const pulse = 1 + breath * 0.005 - strike * 0.015;
+    const pulse = 1 + breath * 0.005 + strike * (cast ? 0.025 : -0.015);
     c.scale(pulse, pulse);
   }
   c.scale(u.side, 1);

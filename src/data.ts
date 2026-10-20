@@ -1,19 +1,17 @@
-export type Kind =
-  | "novice"
-  | "monk"
-  | "mage"
-  | "keito"
-  | "bellkeeper"
-  | "soldier"
-  | "runner"
-  | "heavy"
-  | "sniper"
-  | "bomber"
-  | "gatekeeper"
-  | "emperor"
-  | "guardian";
+import { ALLY_ROSTER } from "./allyRoster.ts";
+export type AllyKind = (typeof ALLY_ROSTER)[number]["id"];
+export type EnemyKind = "soldier" | "runner" | "heavy" | "sniper" | "bomber" | "gatekeeper" | "emperor" | "guardian";
+export type Kind = AllyKind | EnemyKind;
+export interface Ability {
+  type: "heal" | "slow" | "stun" | "push" | "bossSlayer" | "armor";
+  value: number;
+  duration?: number;
+  range?: number;
+}
 export interface Stats {
   name: string;
+  knockback: number;
+  ability?: Ability;
   role: string;
   hp: number;
   damage: number;
@@ -33,82 +31,7 @@ export interface Stats {
   pierce?: boolean;
   stun?: number;
 }
-export const UNITS: Record<Kind, Stats> = {
-  novice: {
-    name: "見習い信者",
-    role: "量産・壁役",
-    hp: 330,
-    damage: 10,
-    range: 38,
-    interval: 1.1,
-    speed: 35,
-    cost: 65,
-    cooldown: 3,
-    area: false,
-    color: "#9db6a1",
-    size: 1,
-    symbol: "祈",
-  },
-  monk: {
-    name: "岩の拳僧",
-    role: "近距離・範囲",
-    hp: 420,
-    damage: 65,
-    range: 55,
-    interval: 1.6,
-    speed: 27,
-    cost: 180,
-    cooldown: 5,
-    area: true,
-    color: "#d29c65",
-    size: 1.14,
-    symbol: "拳",
-  },
-  mage: {
-    name: "ドラクエ信者",
-    role: "遠距離・単体",
-    hp: 140,
-    damage: 130,
-    range: 185,
-    interval: 1.8,
-    speed: 25,
-    cost: 240,
-    cooldown: 8,
-    area: false,
-    color: "#a59bc6",
-    size: 1,
-    symbol: "杖",
-  },
-  keito: {
-    name: "岩尊けいと",
-    role: "大型・範囲",
-    hp: 650,
-    damage: 260,
-    range: 85,
-    interval: 3.2,
-    speed: 19,
-    cost: 750,
-    cooldown: 24,
-    area: true,
-    color: "#e8c36a",
-    size: 1.65,
-    symbol: "岩",
-  },
-  bellkeeper: {
-    name: "鐘守りの巡礼",
-    role: "鐘の盾・範囲",
-    hp: 780,
-    damage: 85,
-    range: 65,
-    interval: 2.6,
-    speed: 18,
-    cost: 380,
-    cooldown: 14,
-    area: true,
-    color: "#61cbbb",
-    size: 1.25,
-    symbol: "鐘",
-  },
+const ENEMY_UNITS = {
   soldier: {
     name: "雑魚兵士",
     role: "近距離",
@@ -238,8 +161,11 @@ export const UNITS: Record<Kind, Stats> = {
     stun: 1.1,
   },
 };
+export const UNITS = Object.fromEntries([
+  ...ALLY_ROSTER.map(entry => [entry.id, entry.stats]),
+  ...Object.entries(ENEMY_UNITS).map(([kind, stats]) => [kind, {...stats, knockback: 1}]),
+]) as Record<Kind, Stats>;
 export const INITIAL_ALLIES: Kind[] = ["novice", "monk", "mage"];
 export const LEGACY_ALLIES: Kind[] = [...INITIAL_ALLIES, "keito"];
-export const ALLIES: Kind[] = [...LEGACY_ALLIES, "bellkeeper"];
-// Compatibility export for the original stage and older integrations.
+export const ALLIES: Kind[] = ALLY_ROSTER.map(entry => entry.id);
 export { DEFAULT_STAGE as STAGE } from "./stages.ts";
