@@ -1,0 +1,21 @@
+{
+  "note": "Rectangular crops of generated concept sheet. Background is NOT transparent and labels/effects may remain. Replace with individually rendered transparent sprites for production.",
+  "frames": [
+    "portrait",
+    "idle_01",
+    "idle_02",
+    "idle_03",
+    "idle_04",
+    "walk_01",
+    "walk_02",
+    "walk_03",
+    "walk_04",
+    "attack_01",
+    "attack_02",
+    "attack_03",
+    "hit_01",
+    "hit_02",
+    "death",
+    "special"
+  ]
+}

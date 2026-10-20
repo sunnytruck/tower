@@ -3,8 +3,10 @@ import {
   CHARACTER_ASSETS,
   containSize,
   hasCharacterAsset,
+  characterAction,
+  characterFrame,
 } from "./characterAssets.ts";
-import { getCharacterImage } from "./characterImages.ts";
+import { getCharacterImage, warmCharacterImages } from "./characterImages.ts";
 
 /** Draw the whole image. False means a confirmed missing/broken asset, never a pending load. */
 export function drawCharacterSprite(
@@ -16,17 +18,40 @@ export function drawCharacterSprite(
   keepInStage = false,
 ): boolean {
   if (!hasCharacterAsset(u.kind)) return false;
-  const state = getCharacterImage(u.kind);
-  if (state.status === "missing") return false;
-  if (state.status === "loading") return true;
+  warmCharacterImages(u.kind);
   const definition = CHARACTER_ASSETS[u.kind],
     a = definition.animation;
-  const frame = containSize(
-    state.image.naturalWidth,
-    state.image.naturalHeight,
+  const action = characterAction(u, walking);
+  const elapsed =
+    action === "death"
+      ? u.dead
+      : action === "hit"
+        ? Math.max(0, 0.18 - u.flash)
+        : action === "attack"
+          ? Math.max(0, 0.3 - u.pose)
+          : time;
+  const selected = characterFrame(definition, action, elapsed);
+  let state = getCharacterImage(u.kind, selected.source);
+  let isFrame = selected.isFrame;
+  // Pending/absent action frames use standing art, not the procedural fallback.
+  if (state.status !== "ready" && isFrame) {
+    state = getCharacterImage(u.kind);
+    isFrame = false;
+  }
+  if (state.status === "missing") return false;
+  if (state.status === "loading") return true;
+  const reference = isFrame ? definition.frameCanvas : undefined;
+  const fit = containSize(
+    reference?.width ?? state.image.naturalWidth,
+    reference?.height ?? state.image.naturalHeight,
     definition.width,
     definition.height,
   );
+  const ratio = fit.width / (reference?.width ?? state.image.naturalWidth);
+  const frame = {
+    width: state.image.naturalWidth * ratio,
+    height: state.image.naturalHeight * ratio,
+  };
   const strike = u.pose > 0 ? Math.sqrt(Math.min(1, u.pose / 0.3)) : 0;
   const step = walking ? Math.sin(time * a.step + u.id) : 0;
   const breath = Math.sin(time * 2.2 + u.id);
@@ -41,10 +66,10 @@ export function drawCharacterSprite(
     const p = Math.min(1, u.dead / 0.55);
     c.globalAlpha *= 1 - p;
     c.translate(-u.side * 75 * p, -Math.sin(p * Math.PI) * 55);
-    c.rotate(p * Math.PI * a.deathSpin * u.side);
+    c.rotate(p * Math.PI * (isFrame ? 0.12 : a.deathSpin) * u.side);
   } else {
     c.translate(
-      u.side * strike * a.lunge,
+      u.side * strike * a.lunge * (isFrame ? 0.2 : 1),
       -Math.abs(step) * a.bob + breath * 0.65,
     );
     c.rotate(

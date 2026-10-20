@@ -43,7 +43,8 @@ npm run preview # distの確認
 - `src/formation.ts`: 10枠の正規化・移動・解除。
 - `src/BattleScreen.tsx` / `src/Portrait.tsx` / `src/style.css`: 戦闘UI・共通キャラ表示・レスポンシブ表示。
 
-味方4種は、それぞれ `public/characters/novice.png`・`monk.png`・`mage.png`・`keito.png` の全身透過画像で描画します。
+味方は `public/characters/` の個別画像で描画します。見習い・拳僧・魔導士は透過PNG、けいとは `iwason/` 内の提供された背景付き仮素材セットを使用します。
+けいとは待機・移動・攻撃・被弾・撃破を状態別フレームで切り替えます。[素材セットの組み込み・透過素材への差し替え](public/characters/iwason/INTEGRATION.md) を参照してください。
 通常表示は旧来の顔アトラスやCanvas衣装合成を使いません。画像が読み込めない場合だけ旧描画へ戻ります。
 同名ファイルの置き換えだけで既存の全画面に反映でき、縦横比と全身表示を維持します。
 WebPへの変更と共通表示部品の使い方は [キャラクター画像の説明](public/characters/README.md) を参照してください。

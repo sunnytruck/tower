@@ -1,8 +1,18 @@
 import type { Kind } from "./data.ts";
 export type SpriteKind = "novice" | "monk" | "mage" | "keito";
+export type CharacterAction = "idle" | "walk" | "attack" | "hit" | "death";
+export interface CharacterClip {
+  frames: readonly string[];
+  fps: number;
+  loop: boolean;
+}
 export interface CharacterAsset {
-  /** A complete transparent PNG/WebP character, including costume and weapon. */
+  /** Full standing art for non-battle screens; may still be draft artwork. */
   image: string;
+  quality?: "draft-background" | "production";
+  clips?: Partial<Record<CharacterAction, CharacterClip>>;
+  /** Shared source-pixel canvas: retain the same scale across differently sized frames. */
+  frameCanvas?: { width: number; height: number };
   width: number;
   height: number;
   animation: {
@@ -34,8 +44,33 @@ export const CHARACTER_ASSETS: Record<SpriteKind, CharacterAsset> = {
     animation: { step: 5, bob: 3, lean: 0.025, lunge: 5, deathSpin: -1.8 },
   },
   keito: {
-    image: "./characters/keito.png",
-    width: 125,
+    image: "./characters/iwason/portrait.png",
+    quality: "draft-background",
+    clips: {
+      idle: {
+        frames: [1, 2, 3, 4].map((n) => `./characters/iwason/idle_0${n}.png`),
+        fps: 4,
+        loop: true,
+      },
+      walk: {
+        frames: [1, 2, 3, 4].map((n) => `./characters/iwason/walk_0${n}.png`),
+        fps: 8,
+        loop: true,
+      },
+      attack: {
+        frames: [1, 2, 3].map((n) => `./characters/iwason/attack_0${n}.png`),
+        fps: 10,
+        loop: false,
+      },
+      hit: {
+        frames: [1, 2].map((n) => `./characters/iwason/hit_0${n}.png`),
+        fps: 12,
+        loop: false,
+      },
+      death: { frames: ["./characters/iwason/death.png"], fps: 1, loop: false },
+    },
+    frameCanvas: { width: 310, height: 255 },
+    width: 185,
     height: 150,
     animation: { step: 5, bob: 1.4, lean: 0.03, lunge: 11, deathSpin: 1 },
   },
@@ -62,4 +97,30 @@ export function containSize(
     return { width: 0, height: 0 };
   const scale = Math.min(maxWidth / width, maxHeight / height);
   return { width: width * scale, height: height * scale };
+}
+
+/** Pure visual-state selection. Combat state is read, never modified. */
+export function characterAction(
+  unit: { hp: number; flash: number; pose: number },
+  walking: boolean,
+): CharacterAction {
+  if (unit.hp <= 0) return "death";
+  if (unit.flash > 0) return "hit";
+  if (unit.pose > 0) return "attack";
+  return walking ? "walk" : "idle";
+}
+export function characterFrame(
+  asset: CharacterAsset,
+  action: CharacterAction,
+  elapsed: number,
+): { source: string; isFrame: boolean } {
+  const clip = asset.clips?.[action];
+  if (!clip?.frames.length) return { source: asset.image, isFrame: false };
+  const tick = Math.floor(
+    Math.max(0, Number.isFinite(elapsed) ? elapsed : 0) * Math.max(0, clip.fps),
+  );
+  const index = clip.loop
+    ? tick % clip.frames.length
+    : Math.min(tick, clip.frames.length - 1);
+  return { source: clip.frames[index], isFrame: true };
 }

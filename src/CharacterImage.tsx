@@ -3,7 +3,11 @@ import { UNITS, type Kind } from "./data";
 import { figure } from "./render";
 import { onArtLoaded } from "./characterArt";
 import { CHARACTER_ASSETS, hasCharacterAsset } from "./characterAssets";
-import { getCharacterImage, onCharacterImageChanged } from "./characterImages";
+import {
+  getCharacterImage,
+  onCharacterImageChanged,
+  warmCharacterImages,
+} from "./characterImages";
 
 export interface CharacterImageProps {
   kind: Kind;
@@ -14,6 +18,9 @@ export function CharacterImage({ kind, hero = false }: CharacterImageProps) {
   const [, refresh] = useState(0);
   const supported = hasCharacterAsset(kind);
   const state = supported ? getCharacterImage(kind) : null;
+  useEffect(() => {
+    if (supported) warmCharacterImages(kind);
+  }, [kind, supported]);
   useEffect(() => onCharacterImageChanged(() => refresh((v) => v + 1)), []);
   const className = `portrait ${hero ? "hero-portrait" : ""}`;
   if (!supported || state?.status === "missing")
@@ -26,6 +33,12 @@ export function CharacterImage({ kind, hero = false }: CharacterImageProps) {
       aria-hidden="true"
       decoding="async"
       draggable={false}
+      data-asset-quality={CHARACTER_ASSETS[kind].quality ?? "production"}
+      title={
+        CHARACTER_ASSETS[kind].quality === "draft-background"
+          ? "仮素材：背景・ラベルあり。透過版への差し替え予定。"
+          : undefined
+      }
       onLoad={() => refresh((v) => v + 1)}
       onError={() => refresh((v) => v + 1)}
     />
