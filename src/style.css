@@ -512,3 +512,26 @@ footer button {
     font-size: 21px;
   }
 }
+.world-viewport {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b8b79b #34443f;
+}
+@media (min-width: 601px) {
+  header {
+    height: 76px;
+  }
+  .stage-heading {
+    padding: 18px 0;
+  }
+  .world {
+    max-height: 33vh;
+  }
+}
+@media (max-width: 600px) {
+  .world {
+    width: 850px;
+    height: auto;
+    max-width: none;
+  }
+}

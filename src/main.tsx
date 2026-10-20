@@ -127,13 +127,19 @@ function App() {
           </div>
           <Base label="敵軍の砦" hp={b.rightHP} enemy />
         </div>
-        <canvas
-          className="world"
-          ref={canvas}
-          width={1400}
-          height={380}
-          aria-label="味方は左から、敵は右から進軍します"
-        />
+        <div
+          className="world-viewport"
+          tabIndex={0}
+          aria-label="戦場。スマートフォンでは左右にスワイプできます"
+        >
+          <canvas
+            className="world"
+            ref={canvas}
+            width={1400}
+            height={380}
+            aria-label="味方は左から、敵は右から進軍します"
+          />
+        </div>
         {b.status !== "playing" && (
           <div className="overlay">
             <div className="dialog">
@@ -187,7 +193,7 @@ function App() {
           <h2>
             信者を召集 <small>DEPLOY UNITS</small>
           </h2>
-          <span>自動前進・自動攻撃</span>
+          <span>自動戦闘 / 戦場は左右にスワイプ</span>
         </div>
         <div className="cards">
           {ALLIES.map((kind, i) => {
