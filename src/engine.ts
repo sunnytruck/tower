@@ -38,7 +38,11 @@ export class Battle {
   readonly stats: Readonly<Record<Kind, Stats>>;
   readonly lineup: readonly (Kind | null)[];
   readonly owned: readonly Kind[];
-  constructor(lineup: readonly (Kind | null)[] = INITIAL_ALLIES, levels: Levels = {}, owned: readonly Kind[] = INITIAL_ALLIES) {
+  constructor(
+    lineup: readonly (Kind | null)[] = INITIAL_ALLIES,
+    levels: Levels = {},
+    owned: readonly Kind[] = INITIAL_ALLIES,
+  ) {
     this.owned = Object.freeze([...owned]);
     this.lineup = Object.freeze(ownedFormation(lineup, this.owned));
     this.levels = Object.freeze(normalizeLevels(levels));

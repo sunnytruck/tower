@@ -44,8 +44,11 @@ export const CHARACTER_ASSETS: Record<SpriteKind, CharacterAsset> = {
     animation: { step: 5, bob: 3, lean: 0.025, lunge: 5, deathSpin: -1.8 },
   },
   bellkeeper: {
-    image: "./characters/bellkeeper.svg", quality: "placeholder", width: 130, height: 145,
-    animation: {step: 6, bob: 2, lean: 0.08, lunge: 12, deathSpin: -2},
+    image: "./characters/bellkeeper.svg",
+    quality: "placeholder",
+    width: 130,
+    height: 145,
+    animation: { step: 6, bob: 2, lean: 0.08, lunge: 12, deathSpin: -2 },
   },
   keito: {
     image: "./characters/iwason/portrait.png",

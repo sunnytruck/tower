@@ -35,9 +35,22 @@ export function assignSlot(
   return next;
 }
 
-export function ownedFormation(input: readonly (Kind | null)[], owned: readonly Kind[]): Formation {
-  return normalizeFormation(input).map(kind => kind && owned.includes(kind) ? kind : null);
+export function ownedFormation(
+  input: readonly (Kind | null)[],
+  owned: readonly Kind[],
+): Formation {
+  return normalizeFormation(input).map((kind) =>
+    kind && owned.includes(kind) ? kind : null,
+  );
 }
-export function assignOwnedSlot(input: readonly (Kind | null)[], slot: number, kind: Kind | null, owned: readonly Kind[]): Formation {
-  return ownedFormation(kind && !owned.includes(kind) ? input : assignSlot(input, slot, kind), owned);
+export function assignOwnedSlot(
+  input: readonly (Kind | null)[],
+  slot: number,
+  kind: Kind | null,
+  owned: readonly Kind[],
+): Formation {
+  return ownedFormation(
+    kind && !owned.includes(kind) ? input : assignSlot(input, slot, kind),
+    owned,
+  );
 }

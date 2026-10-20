@@ -13,8 +13,10 @@ export function UpgradeScreen({
   xp,
   levels,
   onUpgrade,
+  owned,
 }: {
   xp: number;
+  owned: readonly Kind[];
   levels: Levels;
   onUpgrade: (kind: Kind) => boolean;
 }) {
@@ -32,7 +34,7 @@ export function UpgradeScreen({
       ...levels,
       [selected]: Math.min(MAX_LEVEL, level + 1),
     });
-  const canUpgrade = cost !== null && xp >= cost;
+  const canUpgrade = owned.includes(selected) && cost !== null && xp >= cost;
   const strengthen = () => {
     if (onUpgrade(selected))
       setEffect((e) => ({
@@ -140,7 +142,7 @@ export function UpgradeScreen({
         </div>
       </div>
       <nav className="upgrade-roster" aria-label="所持キャラクターを選択">
-        {ALLIES.map((kind) => (
+        {ALLIES.filter((kind) => owned.includes(kind)).map((kind) => (
           <button
             key={kind}
             className={selected === kind ? "selected" : ""}

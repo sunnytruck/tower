@@ -55,33 +55,47 @@ export function useProgress() {
         if (parsed.version > SAVE_VERSION) return;
         current.current = migrateProgress(parsed);
         setProgress(current.current);
-      } catch { /* Keep the valid in-memory save. */ }
+      } catch {
+        /* Keep the valid in-memory save. */
+      }
     };
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
   }, []);
-  const transact = useCallback(async (change: (data: Progress) => Progress): Promise<Progress | null> => {
-    const commit = () => {
-      if (!loaded.canSave || !storage) {
-        setWarning("保存できないためガチャを実行できません。通貨は消費していません。");
-        return null;
-      }
-      try {
-        // Refresh under the origin-wide lock, including pulls from another tab.
-        const latest = loadProgress(storage);
-        if (!latest.canSave) { setWarning(latest.warning); return null; }
-        const base = latest.data;
-        const next = durableChange(storage, SAVE_KEY, base, change);
-        current.current = next;
-        setProgress(next);
-        setWarning(loaded.warning);
-        return next === base ? null : next;
-      } catch {
-        setWarning("結果を保存できませんでした。ガチャの通貨消費・入手は行っていません。");
-        return null;
-      }
-    };
-    return navigator.locks ? navigator.locks.request(SAVE_KEY, commit) : commit();
-  }, [loaded.canSave, loaded.warning, storage]);
+  const transact = useCallback(
+    async (change: (data: Progress) => Progress): Promise<Progress | null> => {
+      const commit = () => {
+        if (!loaded.canSave || !storage) {
+          setWarning(
+            "保存できないためガチャを実行できません。通貨は消費していません。",
+          );
+          return null;
+        }
+        try {
+          // Refresh under the origin-wide lock, including pulls from another tab.
+          const latest = loadProgress(storage);
+          if (!latest.canSave) {
+            setWarning(latest.warning);
+            return null;
+          }
+          const base = latest.data;
+          const next = durableChange(storage, SAVE_KEY, base, change);
+          current.current = next;
+          setProgress(next);
+          setWarning(loaded.warning);
+          return next === base ? null : next;
+        } catch {
+          setWarning(
+            "変更を保存できませんでした。保存済みの召喚結果は保持され、未保存の通貨消費・入手は行いません。",
+          );
+          return null;
+        }
+      };
+      return navigator.locks
+        ? navigator.locks.request(SAVE_KEY, commit)
+        : commit();
+    },
+    [loaded.canSave, loaded.warning, storage],
+  );
   return { progress, update, transact, warning };
 }

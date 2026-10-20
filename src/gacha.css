@@ -1,0 +1,1107 @@
+.summon-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0;
+}
+.summon-heading h1 {
+  font: 900 clamp(25px, 3vw, 38px) var(--serif);
+  letter-spacing: 0.12em;
+}
+.summon-wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff7df;
+  padding: 10px 22px;
+  border: 2px solid #b58b45;
+  border-radius: 40px;
+  box-shadow: 0 4px 0 #a3845030;
+}
+.summon-wallet .game-icon {
+  width: 32px;
+  height: 32px;
+  color: #9d641e;
+}
+.summon-wallet span {
+  font-size: 11px;
+}
+.summon-wallet strong {
+  display: block;
+  font-size: 26px;
+  line-height: 1.1;
+}
+.gacha-screen {
+  position: relative;
+  padding-bottom: 20px;
+}
+.summon-banner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  padding: 14px 20px;
+  border: 2px solid #b48a4f;
+  color: #fff0c0;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(100deg, #423428, #79592f, #423428);
+  box-shadow: inset 0 0 0 3px #edc77840;
+}
+.summon-banner > span {
+  font: 700 18px var(--serif);
+}
+.summon-banner b {
+  font-size: 22px;
+}
+.summon-banner i {
+  color: #ffe985;
+  font-style: normal;
+  margin-left: 8px;
+}
+.summon-banner small {
+  width: 100%;
+  font-size: 11px;
+  color: #dfc69d;
+}
+.summon-machine {
+  isolation: isolate;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(260px, 36vh, 380px);
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 76%,
+    #dcc68d 0,
+    #66897b 40%,
+    #254b47 85%
+  );
+  border: 2px solid #a08047;
+  border-top: 0;
+  border-radius: 0 0 24px 24px;
+}
+.summon-machine:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 80%,
+    #ffe9ab14 0deg 5deg,
+    transparent 5deg 18deg
+  );
+}
+.summon-machine-label {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  color: #fff6d7;
+  text-align: center;
+  font: 700 17px var(--serif);
+  text-shadow: 0 2px 5px #1a342e;
+}
+.summon-character-tease {
+  position: absolute;
+  height: 92%;
+  width: 30%;
+  right: 4%;
+  bottom: -12%;
+  opacity: 0.28;
+  transform: rotate(-8deg);
+  filter: sepia(1);
+}
+.summon-character-tease span {
+  display: none;
+}
+.stone-altar {
+  position: relative;
+  width: 300px;
+  height: 260px;
+  flex-shrink: 0;
+}
+.altar-halo {
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border: 2px solid #ffedb0;
+  border-radius: 50%;
+  left: 45px;
+  top: 10px;
+  box-shadow:
+    0 0 32px #ffe39080,
+    inset 0 0 45px #ffdf8560;
+  animation: altar-breathe 3s ease-in-out infinite;
+}
+.altar-halo:after {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border: 1px dashed #f9e9a877;
+  border-radius: 50%;
+}
+.altar-rays {
+  position: absolute;
+  inset: -60px;
+  background: repeating-conic-gradient(
+    #ffe7a000 0deg 12deg,
+    #ffe7a018 12deg 16deg
+  );
+  border-radius: 50%;
+  animation: orbit 40s linear infinite;
+}
+.altar-stone {
+  position: absolute;
+  top: 45px;
+  width: 105px;
+  height: 158px;
+  background: linear-gradient(115deg, #a2a188, #4a5f56 70%);
+  box-shadow: inset 12px 10px 0 #e1d1a333;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+  transition:
+    transform 1s,
+    filter 1s;
+}
+.stone-left {
+  left: 49px;
+  clip-path: polygon(
+    20% 10%,
+    86% 0,
+    100% 30%,
+    85% 51%,
+    100% 70%,
+    90% 100%,
+    5% 96%,
+    0 65%
+  );
+}
+.stone-right {
+  right: 49px;
+  clip-path: polygon(
+    0 5%,
+    80% 10%,
+    100% 65%,
+    92% 96%,
+    0 100%,
+    13% 70%,
+    0 52%,
+    15% 30%
+  );
+}
+.altar-stone span {
+  color: #ffe6a0;
+  font: 900 64px var(--serif);
+  text-shadow:
+    0 0 14px #ffd775,
+    0 3px 2px #364c41;
+}
+.altar-plinth {
+  position: absolute;
+  bottom: 34px;
+  left: 20px;
+  width: 260px;
+  height: 35px;
+  border-radius: 50% 50% 10px 10px;
+  background: linear-gradient(#a69970, #4e5749);
+  border: 2px solid #c3ad76;
+  text-align: center;
+  box-shadow: 0 12px 16px #162d304d;
+  color: #e9d0a0;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  padding-top: 8px;
+  z-index: 2;
+}
+.altar-sparks {
+  position: absolute;
+  inset: 5px 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffedb2;
+  font-size: 22px;
+  animation: altar-breathe 2s alternate infinite;
+}
+.altar-sparks i {
+  font-size: 13px;
+  align-self: flex-start;
+}
+.summon-actions {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin: 18px auto 13px;
+  max-width: 740px;
+}
+.summon-pull {
+  width: 50%;
+  min-height: 92px;
+  border: 2px solid #775231;
+  border-radius: 16px;
+  box-shadow:
+    0 6px 0 #715332,
+    inset 0 2px 1px #fff5b9;
+  background: linear-gradient(#f8e7b2, #d8b76c);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 14px 18px;
+  color: #533d27;
+}
+.summon-pull > span {
+  font: 900 25px var(--serif);
+}
+.summon-pull > b {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 22px;
+}
+.summon-pull > small {
+  grid-column: 1/-1;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.summon-pull.pull-10 {
+  background: linear-gradient(#f9d876, #df9d43);
+  border-color: #9b5827;
+  box-shadow:
+    0 6px 0 #955626,
+    inset 0 2px 1px #fff5ba;
+}
+.summon-pull:disabled {
+  filter: grayscale(0.6);
+  opacity: 0.65;
+  box-shadow: 0 3px 0 #715332;
+}
+.summon-note {
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.resume-reveal {
+  display: flex;
+  margin: 15px auto;
+}
+.summon-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0 0;
+}
+.summon-details details {
+  min-width: 0;
+  border: 2px solid #9a9c7e;
+  border-radius: 12px;
+  background: #fffae8;
+  overflow: hidden;
+}
+.summon-details summary {
+  padding: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(#fff4d2, #ebdfba);
+}
+.summon-details p {
+  padding: 14px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.gacha-rates table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.gacha-rates th,
+.gacha-rates td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #c7b69166;
+}
+.gacha-rates th:last-child,
+.gacha-rates td:last-child {
+  text-align: right;
+  font-weight: 900;
+}
+.gacha-rates small {
+  display: block;
+  color: #775b30;
+}
+.gacha-rates em {
+  font-size: 10px;
+  margin-left: 6px;
+}
+.gacha-history ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow: auto;
+}
+.gacha-history li + li {
+  border-top: 1px solid #c7b69166;
+}
+.gacha-history li button {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 12px 16px;
+  display: grid;
+  gap: 4px;
+}
+.gacha-history time,
+.gacha-history small {
+  font-size: 11px;
+}
+.gacha-history span {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.gacha-dev {
+  border: 1px dashed #748c79;
+  margin-top: 16px;
+  padding: 12px;
+  font-size: 12px;
+}
+.gacha-dev summary {
+  cursor: pointer;
+}
+.gacha-dev select {
+  padding: 10px;
+  margin: 10px 10px 10px 0;
+  font: inherit;
+}
+.gacha-dev small {
+  display: block;
+}
+.gacha-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #fff2c7;
+  background: radial-gradient(ellipse at center, #3d5548, #071b1b);
+  --reveal-glow: #edcb79;
+}
+.reveal-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse, transparent 40%, #000b);
+  z-index: -1;
+}
+.reveal-skip {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 5;
+}
+.preview-stamp {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  font-size: 12px;
+  z-index: 5;
+  max-width: 50%;
+}
+.reveal-orbit {
+  position: absolute;
+  width: 120vmax;
+  height: 120vmax;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    transparent 0deg 10deg,
+    #ffe29e19 10deg 13deg
+  );
+  animation: orbit 35s linear infinite;
+  z-index: -1;
+}
+.reveal-stage {
+  width: min(100%, 1100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 90%;
+  animation: stage-appear 0.45s both;
+}
+.reveal-stage > .stone-altar {
+  transform: scale(1.4);
+  margin-bottom: 60px;
+}
+.reveal-copy {
+  position: relative;
+  text-align: center;
+  padding: 10px 18px;
+  max-width: 100%;
+}
+.reveal-copy h2 {
+  font: 900 clamp(26px, 5vw, 64px) var(--serif);
+  text-shadow:
+    0 3px 0 #694b29,
+    0 0 26px var(--reveal-glow);
+  line-height: 1.4;
+}
+.reveal-copy p {
+  margin-top: 12px;
+  font-size: clamp(12px, 2vw, 18px);
+  letter-spacing: 0.16em;
+  text-shadow: 0 2px 5px #000;
+}
+.reveal-progress {
+  position: absolute;
+  bottom: 22px;
+  display: flex;
+  gap: 8px;
+}
+.reveal-progress i {
+  height: 3px;
+  width: 24px;
+  background: #ffffff25;
+}
+.reveal-progress .lit {
+  background: #ffdea0;
+}
+.summoned-character {
+  position: relative;
+  width: min(650px, 80vw);
+  height: min(56vh, 550px);
+  filter: drop-shadow(0 0 30px #ffe7aacc);
+  animation: character-arrive 0.7s cubic-bezier(0.15, 0.8, 0.3, 1) both;
+}
+.summoned-character .portrait {
+  object-fit: contain;
+}
+.phase-dark,
+.phase-silence {
+  background: #020504;
+}
+.phase-dark .reveal-orbit,
+.phase-dark .stone-altar,
+.phase-silence .reveal-orbit {
+  opacity: 0;
+}
+.phase-silence .stone-altar {
+  filter: grayscale(1) brightness(0.3);
+}
+.phase-ukiki {
+  background: radial-gradient(#93381d, #190a05);
+  --reveal-glow: #ffac4d;
+}
+.phase-ukiki .reveal-copy h2 {
+  font-size: clamp(64px, 15vw, 160px);
+  transform: rotate(-8deg);
+}
+.phase-ukiki .stone-altar {
+  display: none;
+}
+.phase-red {
+  background: radial-gradient(#a32a31, #210d19);
+  --reveal-glow: #ff5252;
+}
+.phase-red .altar-halo {
+  box-shadow: 0 0 80px #f64b4b;
+  border-color: #ff7373;
+}
+.phase-red .reveal-copy {
+  border-top: 3px solid #ff7668;
+  border-bottom: 3px solid #ff7668;
+}
+.phase-gold,
+.phase-cutin,
+.phase-split {
+  background: radial-gradient(#bb8a31, #332615 70%);
+}
+.phase-gold .altar-stone {
+  background: linear-gradient(100deg, #fff0b5, #e4b54f, #8d5e29);
+  border: 4px solid #ffd78d;
+  clip-path: none;
+}
+.phase-gold .altar-halo {
+  box-shadow: 0 0 100px #fff2ab;
+}
+.phase-cutin .reveal-copy {
+  padding: 25px;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    #68491f,
+    #68491f,
+    transparent
+  );
+  transform: rotate(-7deg);
+  border-block: 4px solid #ffdf89;
+}
+.phase-cutin .stone-altar {
+  display: none;
+}
+.phase-cutin .reveal-stage {
+  animation: impact-shake 0.35s;
+}
+.split-open .stone-left {
+  animation: stone-crack-left 1.2s forwards;
+}
+.split-open .stone-right {
+  animation: stone-crack-right 1.2s forwards;
+}
+.split-open .altar-halo {
+  background: #fff5be;
+  box-shadow: 0 0 100px 50px #ffdc78;
+}
+.phase-rainbow,
+.phase-legend {
+  background:
+    radial-gradient(ellipse, #ffe8a450, transparent 65%),
+    conic-gradient(from 40deg, #712a69, #1c536c, #376a46, #7b572e, #712a69);
+  --reveal-glow: #fff3a9;
+}
+.phase-rainbow .reveal-stage {
+  animation: impact-shake 0.45s;
+}
+.phase-rainbow .altar-halo {
+  box-shadow:
+    0 0 110px #fff5da,
+    inset 0 0 45px #f886ff;
+}
+.phase-rainbow .reveal-orbit,
+.phase-legend .reveal-orbit {
+  background: repeating-conic-gradient(
+    transparent 0deg 12deg,
+    #fff8bc44 12deg 16deg
+  );
+  animation-duration: 15s;
+}
+.gacha-reels {
+  display: flex;
+  gap: 15px;
+  padding: 24px;
+  margin-bottom: 35px;
+  border: 7px double #f6d788;
+  border-radius: 24px;
+  background: linear-gradient(130deg, #c98e37, #72522b);
+  box-shadow:
+    0 0 60px #ffdf8c55,
+    inset 0 0 20px #342215;
+}
+.reel-window {
+  width: clamp(60px, 16vw, 155px);
+  height: clamp(110px, 24vh, 210px);
+  background: linear-gradient(#fff9df, #fbe19a);
+  overflow: hidden;
+  border: 3px solid #68441e;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 10px 18px #563c2a5c,
+    inset 0 -10px 18px #563c2a5c;
+}
+.reel-window span {
+  display: block;
+  text-align: center;
+  font: 900 clamp(80px, 16vh, 155px)/clamp(110px, 24vh, 210px) var(--serif);
+  color: #b73525;
+  text-shadow:
+    2px 3px #fff0a9,
+    4px 5px #6c4223;
+  white-space: pre-line;
+}
+.spinning .reel-window span {
+  animation: reel-roll 0.4s linear infinite;
+}
+.spinning .reel-window:nth-child(2) span {
+  animation-delay: -0.13s;
+}
+.spinning .reel-window:nth-child(3) span {
+  animation-delay: -0.27s;
+}
+.phase-fullspin .spinning .reel-window span {
+  animation-duration: 1.1s;
+  animation-delay: 0s;
+}
+.phase-jackpot .reveal-stage {
+  animation: impact-shake 0.5s;
+}
+.phase-jackpot .gacha-reels {
+  box-shadow: 0 0 90px #ffe290;
+}
+.phase-jackpot .reveal-copy h2 {
+  color: #ffde78;
+}
+.theme-keito.phase-reveal {
+  background: radial-gradient(#dba83e, #292316 80%);
+}
+.phase-legend .reveal-copy h2 {
+  font-size: clamp(25px, 4.7vw, 58px);
+}
+.phase-legend .summoned-character {
+  height: min(55vh, 510px);
+}
+.phase-legend .reveal-stage:before {
+  content: "伝説";
+  position: absolute;
+  font: 900 min(33vw, 400px) var(--serif);
+  color: #ffe7a31c;
+  z-index: -1;
+}
+.gacha-results-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: #102c27de;
+  backdrop-filter: blur(8px);
+  overflow: auto;
+}
+.gacha-results {
+  width: min(1050px, 100%);
+  max-height: calc(100dvh - 44px);
+  overflow: auto;
+  background: radial-gradient(ellipse at top, #fff8d9, #e3d3a5);
+  border: 5px double #b18b4e;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 0 80px #edd29d33;
+}
+.result-heading {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.result-heading h2 {
+  font: 900 clamp(23px, 3vw, 34px) var(--serif);
+  margin: 8px 0;
+}
+.result-heading p {
+  font-size: 12px;
+}
+.gacha-result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.gacha-result-card {
+  position: relative;
+  text-align: center;
+  min-width: 0;
+  border: 2px solid var(--rarity-color, #adab93);
+  background: linear-gradient(#fffdf0, #ded7b8);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 4px 0 #554a2d22;
+  animation: stage-appear 0.35s both;
+}
+.gacha-result-card h3 {
+  font-size: 13px;
+  margin: 5px 0;
+}
+.result-art {
+  height: clamp(90px, 17vh, 160px);
+}
+.rarity-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #5c4527;
+  background: color-mix(in srgb, var(--rarity-color, #adab93) 35%, white);
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.rarity-0 {
+  --rarity-color: #9da58b;
+}
+.rarity-1 {
+  --rarity-color: #62ad9a;
+}
+.rarity-2 {
+  --rarity-color: #a28ed5;
+}
+.rarity-3 {
+  --rarity-color: #ddae46;
+}
+.rarity-4 {
+  --rarity-color: #cd7b8e;
+  background: linear-gradient(120deg, #ffe59e, #e7f4d4, #ebdaf6);
+  box-shadow: 0 0 20px #d6b96966;
+}
+.result-new {
+  color: #aa4025;
+  font-size: 13px;
+}
+.result-duplicate {
+  color: #566d5b;
+  font-size: 11px;
+}
+.placeholder-label {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  color: #776946;
+}
+.single-result {
+  grid-template-columns: 1fr;
+  max-width: 360px;
+  margin: auto;
+}
+.single-result .result-art {
+  height: min(40vh, 330px);
+}
+.single-result h3 {
+  font-size: 24px;
+}
+.gacha-result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 24px 0 5px;
+  flex-wrap: wrap;
+}
+.rarity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+.rarity-filters [aria-pressed="true"] {
+  background: #367661;
+  color: #fff4d7;
+}
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.collection-card {
+  padding: 18px;
+  min-width: 0;
+  border: 2px solid var(--rarity-color, #adab93);
+  border-radius: 15px;
+  text-align: center;
+  background-color: #fff8e3;
+}
+.collection-art {
+  height: 230px;
+  position: relative;
+}
+.collection-card h2 {
+  font: 900 22px var(--serif);
+  margin: 12px 0 5px;
+}
+.collection-card p {
+  font-size: 13px;
+  margin: 6px 0;
+}
+.collection-card > small {
+  font-size: 11px;
+}
+.silhouette .portrait {
+  filter: brightness(0);
+  opacity: 0.4;
+}
+.silhouette > b {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 900 60px var(--serif);
+  color: #fff4cc;
+  text-shadow: 0 3px 3px #2b3832;
+}
+.locked-caption {
+  font-weight: 700;
+  color: #766545;
+}
+.victory-stones {
+  color: #856224;
+  font-size: 18px;
+}
+@keyframes altar-breathe {
+  50% {
+    opacity: 0.6;
+    filter: brightness(1.2);
+  }
+}
+@keyframes orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes stage-appear {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+@keyframes character-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes impact-shake {
+  10%,
+  50%,
+  90% {
+    transform: translate(-5px, 2px);
+  }
+  30%,
+  70% {
+    transform: translate(5px, -2px);
+  }
+}
+@keyframes reel-roll {
+  to {
+    transform: translateY(-80%);
+  }
+}
+@keyframes stone-crack-left {
+  25% {
+    transform: translateX(-6px);
+  }
+  to {
+    transform: translate(-100px, 10px) rotate(-18deg);
+    opacity: 0.1;
+  }
+}
+@keyframes stone-crack-right {
+  25% {
+    transform: translateX(6px);
+  }
+  to {
+    transform: translate(100px, 10px) rotate(18deg);
+    opacity: 0.1;
+  }
+}
+@media (max-width: 760px) {
+  .summon-heading {
+    gap: 8px;
+  }
+  .summon-wallet {
+    padding: 8px 14px;
+  }
+  .summon-wallet strong {
+    font-size: 23px;
+  }
+  .summon-wallet .game-icon {
+    width: 24px;
+  }
+  .summon-heading .eyebrow {
+    font-size: 9px;
+  }
+  .summon-banner {
+    gap: 4px;
+    padding: 12px 8px;
+  }
+  .summon-banner > span {
+    font-size: 14px;
+    width: 100%;
+  }
+  .summon-banner b {
+    font-size: 21px;
+  }
+  .summon-banner small {
+    font-size: 9px;
+  }
+  .summon-machine {
+    height: 260px;
+  }
+  .summon-character-tease {
+    width: 50%;
+    right: -13%;
+  }
+  .summon-actions {
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .summon-pull {
+    padding: 12px 8px;
+    grid-template-columns: 1fr;
+    min-height: 110px;
+  }
+  .summon-pull > span {
+    font-size: 22px;
+  }
+  .summon-pull > b {
+    justify-content: center;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+  .summon-pull > small {
+    font-size: 10px;
+  }
+  .summon-note {
+    font-size: 10px;
+  }
+  .summon-details {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .reveal-skip {
+    top: 14px;
+    right: 14px;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .preview-stamp {
+    left: 12px;
+    top: 18px;
+    font-size: 10px;
+    max-width: 43%;
+  }
+  .reveal-stage > .stone-altar {
+    transform: scale(1);
+    margin-bottom: 20px;
+  }
+  .reveal-copy p {
+    letter-spacing: 0.05em;
+  }
+  .gacha-reels {
+    padding: 14px;
+    gap: 8px;
+  }
+  .gacha-results-backdrop {
+    padding: 10px;
+  }
+  .gacha-results {
+    padding: 18px 12px;
+    max-height: calc(100dvh - 20px);
+    border-radius: 16px;
+  }
+  .gacha-result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .gacha-result-card h3 {
+    font-size: 12px;
+  }
+  .gacha-result-grid.single-result {
+    grid-template-columns: 1fr;
+  }
+  .gacha-result-actions {
+    gap: 8px;
+  }
+  .gacha-result-actions button {
+    font-size: 12px;
+    padding: 10px;
+  }
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .collection-card {
+    padding: 12px 8px;
+  }
+  .collection-art {
+    height: 180px;
+  }
+  .collection-card h2 {
+    font-size: 17px;
+  }
+  .collection-card p {
+    font-size: 11px;
+  }
+  .collection-card strong {
+    font-size: 12px;
+  }
+  .rarity-filters {
+    gap: 7px;
+  }
+  .rarity-filters button {
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+}
+@media (max-height: 520px) and (min-width: 761px) {
+  .reveal-stage {
+    flex-direction: row;
+    gap: 35px;
+  }
+  .reveal-stage > .stone-altar {
+    transform: scale(0.9);
+    margin: 0;
+  }
+  .reveal-copy {
+    max-width: 50%;
+  }
+  .summoned-character {
+    height: 80vh;
+    width: 40vw;
+  }
+  .gacha-reels {
+    margin: 0;
+  }
+  .phase-legend .summoned-character {
+    height: 80vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gacha-screen *,
+  .gacha-screen *:before,
+  .gacha-screen *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .spinning .reel-window span {
+    transform: translateY(-50%);
+  }
+}
+
+.phase-gold .stone-left {
+  transform-origin: left center;
+  animation: gold-door-left 1.4s ease-in forwards;
+}
+.phase-gold .stone-right {
+  transform-origin: right center;
+  animation: gold-door-right 1.4s ease-in forwards;
+}
+.altar-sparks i {
+  animation: prayer-spark 2.7s ease-out infinite;
+}
+.altar-sparks i:nth-child(2) {
+  animation-delay: -1.3s;
+}
+@keyframes gold-door-left {
+  40% {
+    transform: none;
+  }
+  to {
+    transform: perspective(400px) rotateY(-80deg) translateX(-15px);
+  }
+}
+@keyframes gold-door-right {
+  40% {
+    transform: none;
+  }
+  to {
+    transform: perspective(400px) rotateY(80deg) translateX(15px);
+  }
+}
+@keyframes prayer-spark {
+  from {
+    transform: translateY(120px) scale(0.6);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px) scale(1.3);
+    opacity: 0;
+  }
+}

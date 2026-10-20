@@ -3,7 +3,7 @@ import type { Formation } from "./formation";
 import { CharacterImage } from "./CharacterImage";
 import { GameIcon } from "./GameIcon";
 import { Battle } from "./engine";
-import { UNITS, STAGE } from "./data";
+import { UNITS, STAGE, type Kind } from "./data";
 import { draw } from "./render";
 import { levelOf, type Levels } from "./progression";
 import "./style.css";
@@ -14,16 +14,23 @@ export function BattleScreen({
   xp,
   saveWarning,
   onVictory,
+  owned,
+  victoryRewards,
 }: {
   lineup: Formation;
   onHome: () => void;
   levels: Levels;
+  owned: readonly Kind[];
+  victoryRewards: Record<
+    string,
+    { xp: number; stones: number; firstClear: boolean }
+  >;
   xp: number;
   saveWarning: string;
   onVictory: (id: string) => void;
 }) {
   const battle = useRef<Battle | null>(null);
-  if (!battle.current) battle.current = new Battle(lineup, levels);
+  if (!battle.current) battle.current = new Battle(lineup, levels, owned);
   const settled = useRef(new WeakSet<Battle>());
   const canvas = useRef<HTMLCanvasElement>(null);
   const [, refresh] = useState(0);
@@ -87,7 +94,7 @@ export function BattleScreen({
             ? "高速接近：壁役の出撃資金を確保"
             : "前衛：壁役と後衛を組み合わせよう";
   const retry = () => {
-    battle.current = new Battle(b.lineup, b.levels);
+    battle.current = new Battle(b.lineup, b.levels, b.owned);
     battle.current!.toggle();
     refresh((v) => v + 1);
   };
@@ -230,6 +237,12 @@ export function BattleScreen({
                 <div className="victory-xp" role="status">
                   <GameIcon name="star" />
                   <strong>+{STAGE.victoryXP} XP 獲得</strong>
+                  <strong className="victory-stones">
+                    ◆ +{victoryRewards[b.id]?.stones ?? 0} 信仰石
+                    {victoryRewards[b.id]?.firstClear
+                      ? "（初回クリア）"
+                      : "（周回報酬）"}
+                  </strong>
                   <small>
                     所持XP {xp.toLocaleString()} / ホームから強化できます
                   </small>

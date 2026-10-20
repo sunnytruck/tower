@@ -24,7 +24,10 @@ export function figure(
       !drawCharacterSprite(c, u, t, walking, d.size * displayScale, showHealth)
     )
       if (isAlly(u.kind)) drawAlly(c, u, t, walking);
-      else { c.fillStyle = d.color; c.fillText("鐘", -12, -50); }
+      else {
+        c.fillStyle = d.color;
+        c.fillText("鐘", -12, -50);
+      }
     if (showHealth && u.hp > 0) {
       const top = u.kind === "mage" ? -146 : u.kind === "keito" ? -145 : -120;
       c.fillStyle = "#283b33";
